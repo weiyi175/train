@@ -1,0 +1,84 @@
+{
+  "short": {
+    "tag": "SHORT",
+    "total": 425,
+    "label_dist": {
+      "smoke": 425
+    },
+    "smoke_ratio_mean": 0.9613270588235303,
+    "smoke_ratio_median": 1.0,
+    "smoke_ratio_p10": 0.8333,
+    "smoke_ratio_p90": 1.0,
+    "smoke_ratio_min": 0.8333,
+    "smoke_ratio_max": 1.0,
+    "phase_sample_dist": {
+      "2": 1320,
+      "3": 117,
+      "5": 2687,
+      "6": 345,
+      "4": 751,
+      "1": 780
+    },
+    "phase_majority_window_dist": {
+      "5": 224,
+      "4": 27,
+      "2": 113,
+      "1": 38,
+      "6": 23
+    },
+    "missing_first_raw_col": 32,
+    "window_size_est": 30
+  },
+  "long": {
+    "tag": "LONG",
+    "total": 354,
+    "label_dist": {
+      "smoke": 184,
+      "no_smoke": 170
+    },
+    "smoke_ratio_mean": 0.48467118644067786,
+    "smoke_ratio_median": 0.5266500000000001,
+    "smoke_ratio_p10": 0.0,
+    "smoke_ratio_p90": 1.0,
+    "smoke_ratio_min": 0.0,
+    "smoke_ratio_max": 1.0,
+    "phase_sample_dist": {
+      "1": 1162,
+      "2": 5275,
+      "3": 315,
+      "5": 5392,
+      "6": 1714,
+      "4": 1142
+    },
+    "phase_majority_window_dist": {
+      "2": 137,
+      "5": 154,
+      "1": 21,
+      "6": 30,
+      "4": 12
+    },
+    "approach_speed_peak_stats": {
+      "min": -47.249145,
+      "max": 1.463925,
+      "mean": -6.704373025423728,
+      "p10": -15.364892,
+      "p90": 0.0
+    },
+    "hold_duration_stats": {
+      "min": 0.0,
+      "max": 11.0,
+      "mean": 2.096045197740113,
+      "p10": 1.0,
+      "p90": 4.0
+    },
+    "leave_speed_peak_stats": {
+      "min": 0.0,
+      "max": 39.168302,
+      "mean": 8.094418347457628,
+      "p10": 0.9729750000000005,
+      "p90": 17.835325999999995
+    },
+    "missing_first_raw_col": 28,
+    "window_size_est": 75
+  }
+}

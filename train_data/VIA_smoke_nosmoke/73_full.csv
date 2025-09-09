@@ -1,0 +1,4 @@
+start,end,label
+0.0,3.645,no_smoke
+3.645,7.7314,smoke
+7.7314,10.9667,no_smoke

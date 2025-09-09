@@ -1,6 +1,4 @@
-train_data/
-test_data/
+# 排除 .mp4
 *.mp4
-
 # 排除 VSCode 設定
 .vscode/

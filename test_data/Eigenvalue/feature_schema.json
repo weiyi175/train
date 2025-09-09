@@ -1,0 +1,482 @@
+{
+  "frame": {
+    "description": "幀索引"
+  },
+  "time_sec": {
+    "description": "時間 (秒)"
+  },
+  "yaw_est": {
+    "description": "Clamp 後臉部 yaw (-1~1)"
+  },
+  "yaw_raw_ratio": {
+    "description": "未 clamp 前 nose 在眼睛線段比例 (可超出 0~1)"
+  },
+  "yaw_valid_flag": {
+    "description": "yaw 是否有效 (1 有效 / 0 無)"
+  },
+  "face_orient_class": {
+    "description": "臉方向分類 -1 左 0 正 1 右"
+  },
+  "mouth_x": {
+    "description": "嘴中心 X"
+  },
+  "mouth_y": {
+    "description": "嘴中心 Y"
+  },
+  "mouth_z": {
+    "description": "嘴中心 Z"
+  },
+  "mouth_width_3d": {
+    "description": "嘴左右點 3D 距離"
+  },
+  "mouth_width_2d": {
+    "description": "嘴左右點 2D (XY) 距離"
+  },
+  "mouth_conf_raw": {
+    "description": "嘴點原始平均可見度"
+  },
+  "mouth_conf_adj": {
+    "description": "嘴點調整後可見度"
+  },
+  "mouth_from_estimation": {
+    "description": "是否估算嘴 (1 是)"
+  },
+  "mouth_vx": {
+    "description": "嘴中心速度 x"
+  },
+  "mouth_vy": {
+    "description": "嘴中心速度 y"
+  },
+  "mouth_vz": {
+    "description": "嘴中心速度 z"
+  },
+  "mouth_ax": {
+    "description": "嘴中心加速度 x"
+  },
+  "mouth_ay": {
+    "description": "嘴中心加速度 y"
+  },
+  "mouth_az": {
+    "description": "嘴中心加速度 z"
+  },
+  "dist_leftHand_mouth": {
+    "description": "左手-嘴 3D 距離"
+  },
+  "dist_rightHand_mouth": {
+    "description": "右手-嘴 3D 距離"
+  },
+  "dist_hands": {
+    "description": "雙手 3D 距離"
+  },
+  "dist_nose_leftHand": {
+    "description": "鼻-左手 3D 距離"
+  },
+  "dist_nose_rightHand": {
+    "description": "鼻-右手 3D 距離"
+  },
+  "dist_wrists": {
+    "description": "雙腕 3D 距離"
+  },
+  "dist2d_leftHand_mouth": {
+    "description": "左手-嘴 2D 距離"
+  },
+  "dist2d_rightHand_mouth": {
+    "description": "右手-嘴 2D 距離"
+  },
+  "dist2d_hands": {
+    "description": "雙手 2D 距離"
+  },
+  "dist2d_nose_leftHand": {
+    "description": "鼻-左手 2D 距離"
+  },
+  "dist2d_nose_rightHand": {
+    "description": "鼻-右手 2D 距離"
+  },
+  "dist2d_wrists": {
+    "description": "雙腕 2D 距離"
+  },
+  "occlusion_flag": {
+    "description": "嘴被任一手接近遮擋"
+  },
+  "velocity_jump_flag": {
+    "description": "任一點速度/加速度異常跳變"
+  },
+  "l0_vx": {
+    "description": "landmark 0 vx"
+  },
+  "l0_vy": {
+    "description": "landmark 0 vy"
+  },
+  "l0_vz": {
+    "description": "landmark 0 vz"
+  },
+  "l0_ax": {
+    "description": "landmark 0 ax"
+  },
+  "l0_ay": {
+    "description": "landmark 0 ay"
+  },
+  "l0_az": {
+    "description": "landmark 0 az"
+  },
+  "l1_vx": {
+    "description": "landmark 1 vx"
+  },
+  "l1_vy": {
+    "description": "landmark 1 vy"
+  },
+  "l1_vz": {
+    "description": "landmark 1 vz"
+  },
+  "l1_ax": {
+    "description": "landmark 1 ax"
+  },
+  "l1_ay": {
+    "description": "landmark 1 ay"
+  },
+  "l1_az": {
+    "description": "landmark 1 az"
+  },
+  "l2_vx": {
+    "description": "landmark 2 vx"
+  },
+  "l2_vy": {
+    "description": "landmark 2 vy"
+  },
+  "l2_vz": {
+    "description": "landmark 2 vz"
+  },
+  "l2_ax": {
+    "description": "landmark 2 ax"
+  },
+  "l2_ay": {
+    "description": "landmark 2 ay"
+  },
+  "l2_az": {
+    "description": "landmark 2 az"
+  },
+  "l3_vx": {
+    "description": "landmark 3 vx"
+  },
+  "l3_vy": {
+    "description": "landmark 3 vy"
+  },
+  "l3_vz": {
+    "description": "landmark 3 vz"
+  },
+  "l3_ax": {
+    "description": "landmark 3 ax"
+  },
+  "l3_ay": {
+    "description": "landmark 3 ay"
+  },
+  "l3_az": {
+    "description": "landmark 3 az"
+  },
+  "l4_vx": {
+    "description": "landmark 4 vx"
+  },
+  "l4_vy": {
+    "description": "landmark 4 vy"
+  },
+  "l4_vz": {
+    "description": "landmark 4 vz"
+  },
+  "l4_ax": {
+    "description": "landmark 4 ax"
+  },
+  "l4_ay": {
+    "description": "landmark 4 ay"
+  },
+  "l4_az": {
+    "description": "landmark 4 az"
+  },
+  "l5_vx": {
+    "description": "landmark 5 vx"
+  },
+  "l5_vy": {
+    "description": "landmark 5 vy"
+  },
+  "l5_vz": {
+    "description": "landmark 5 vz"
+  },
+  "l5_ax": {
+    "description": "landmark 5 ax"
+  },
+  "l5_ay": {
+    "description": "landmark 5 ay"
+  },
+  "l5_az": {
+    "description": "landmark 5 az"
+  },
+  "l6_vx": {
+    "description": "landmark 6 vx"
+  },
+  "l6_vy": {
+    "description": "landmark 6 vy"
+  },
+  "l6_vz": {
+    "description": "landmark 6 vz"
+  },
+  "l6_ax": {
+    "description": "landmark 6 ax"
+  },
+  "l6_ay": {
+    "description": "landmark 6 ay"
+  },
+  "l6_az": {
+    "description": "landmark 6 az"
+  },
+  "l9_vx": {
+    "description": "landmark 9 vx"
+  },
+  "l9_vy": {
+    "description": "landmark 9 vy"
+  },
+  "l9_vz": {
+    "description": "landmark 9 vz"
+  },
+  "l9_ax": {
+    "description": "landmark 9 ax"
+  },
+  "l9_ay": {
+    "description": "landmark 9 ay"
+  },
+  "l9_az": {
+    "description": "landmark 9 az"
+  },
+  "l10_vx": {
+    "description": "landmark 10 vx"
+  },
+  "l10_vy": {
+    "description": "landmark 10 vy"
+  },
+  "l10_vz": {
+    "description": "landmark 10 vz"
+  },
+  "l10_ax": {
+    "description": "landmark 10 ax"
+  },
+  "l10_ay": {
+    "description": "landmark 10 ay"
+  },
+  "l10_az": {
+    "description": "landmark 10 az"
+  },
+  "l11_vx": {
+    "description": "landmark 11 vx"
+  },
+  "l11_vy": {
+    "description": "landmark 11 vy"
+  },
+  "l11_vz": {
+    "description": "landmark 11 vz"
+  },
+  "l11_ax": {
+    "description": "landmark 11 ax"
+  },
+  "l11_ay": {
+    "description": "landmark 11 ay"
+  },
+  "l11_az": {
+    "description": "landmark 11 az"
+  },
+  "l12_vx": {
+    "description": "landmark 12 vx"
+  },
+  "l12_vy": {
+    "description": "landmark 12 vy"
+  },
+  "l12_vz": {
+    "description": "landmark 12 vz"
+  },
+  "l12_ax": {
+    "description": "landmark 12 ax"
+  },
+  "l12_ay": {
+    "description": "landmark 12 ay"
+  },
+  "l12_az": {
+    "description": "landmark 12 az"
+  },
+  "l13_vx": {
+    "description": "landmark 13 vx"
+  },
+  "l13_vy": {
+    "description": "landmark 13 vy"
+  },
+  "l13_vz": {
+    "description": "landmark 13 vz"
+  },
+  "l13_ax": {
+    "description": "landmark 13 ax"
+  },
+  "l13_ay": {
+    "description": "landmark 13 ay"
+  },
+  "l13_az": {
+    "description": "landmark 13 az"
+  },
+  "l14_vx": {
+    "description": "landmark 14 vx"
+  },
+  "l14_vy": {
+    "description": "landmark 14 vy"
+  },
+  "l14_vz": {
+    "description": "landmark 14 vz"
+  },
+  "l14_ax": {
+    "description": "landmark 14 ax"
+  },
+  "l14_ay": {
+    "description": "landmark 14 ay"
+  },
+  "l14_az": {
+    "description": "landmark 14 az"
+  },
+  "l15_vx": {
+    "description": "landmark 15 vx"
+  },
+  "l15_vy": {
+    "description": "landmark 15 vy"
+  },
+  "l15_vz": {
+    "description": "landmark 15 vz"
+  },
+  "l15_ax": {
+    "description": "landmark 15 ax"
+  },
+  "l15_ay": {
+    "description": "landmark 15 ay"
+  },
+  "l15_az": {
+    "description": "landmark 15 az"
+  },
+  "l16_vx": {
+    "description": "landmark 16 vx"
+  },
+  "l16_vy": {
+    "description": "landmark 16 vy"
+  },
+  "l16_vz": {
+    "description": "landmark 16 vz"
+  },
+  "l16_ax": {
+    "description": "landmark 16 ax"
+  },
+  "l16_ay": {
+    "description": "landmark 16 ay"
+  },
+  "l16_az": {
+    "description": "landmark 16 az"
+  },
+  "l17_vx": {
+    "description": "landmark 17 vx"
+  },
+  "l17_vy": {
+    "description": "landmark 17 vy"
+  },
+  "l17_vz": {
+    "description": "landmark 17 vz"
+  },
+  "l17_ax": {
+    "description": "landmark 17 ax"
+  },
+  "l17_ay": {
+    "description": "landmark 17 ay"
+  },
+  "l17_az": {
+    "description": "landmark 17 az"
+  },
+  "l18_vx": {
+    "description": "landmark 18 vx"
+  },
+  "l18_vy": {
+    "description": "landmark 18 vy"
+  },
+  "l18_vz": {
+    "description": "landmark 18 vz"
+  },
+  "l18_ax": {
+    "description": "landmark 18 ax"
+  },
+  "l18_ay": {
+    "description": "landmark 18 ay"
+  },
+  "l18_az": {
+    "description": "landmark 18 az"
+  },
+  "l19_vx": {
+    "description": "landmark 19 vx"
+  },
+  "l19_vy": {
+    "description": "landmark 19 vy"
+  },
+  "l19_vz": {
+    "description": "landmark 19 vz"
+  },
+  "l19_ax": {
+    "description": "landmark 19 ax"
+  },
+  "l19_ay": {
+    "description": "landmark 19 ay"
+  },
+  "l19_az": {
+    "description": "landmark 19 az"
+  },
+  "l20_vx": {
+    "description": "landmark 20 vx"
+  },
+  "l20_vy": {
+    "description": "landmark 20 vy"
+  },
+  "l20_vz": {
+    "description": "landmark 20 vz"
+  },
+  "l20_ax": {
+    "description": "landmark 20 ax"
+  },
+  "l20_ay": {
+    "description": "landmark 20 ay"
+  },
+  "l20_az": {
+    "description": "landmark 20 az"
+  },
+  "l21_vx": {
+    "description": "landmark 21 vx"
+  },
+  "l21_vy": {
+    "description": "landmark 21 vy"
+  },
+  "l21_vz": {
+    "description": "landmark 21 vz"
+  },
+  "l21_ax": {
+    "description": "landmark 21 ax"
+  },
+  "l21_ay": {
+    "description": "landmark 21 ay"
+  },
+  "l21_az": {
+    "description": "landmark 21 az"
+  },
+  "l22_vx": {
+    "description": "landmark 22 vx"
+  },
+  "l22_vy": {
+    "description": "landmark 22 vy"
+  },
+  "l22_vz": {
+    "description": "landmark 22 vz"
+  },
+  "l22_ax": {
+    "description": "landmark 22 ax"
+  },
+  "l22_ay": {
+    "description": "landmark 22 ay"
+  },
+  "l22_az": {
+    "description": "landmark 22 az"
+  }
+}

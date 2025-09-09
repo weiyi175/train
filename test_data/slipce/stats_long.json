@@ -1,0 +1,10 @@
+{
+  "total_windows": 354,
+  "smoke_windows": 184,
+  "no_smoke_windows": 170,
+  "smoke_ratio_thresh": 0.5,
+  "win_size": 75,
+  "stride": 40,
+  "norm_type": "video_zscore",
+  "feature_count": 34
+}
