@@ -1,7 +1,7 @@
 {
-  "total_windows": 425,
+  "total_windows": 850,
   "smoke_windows": 425,
-  "no_smoke_windows": 0,
+  "no_smoke_windows": 425,
   "smoke_ratio_thresh": 0.5,
   "win_size": 30,
   "stride": 15,

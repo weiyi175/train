@@ -1,32 +1,37 @@
 {
   "short": {
     "tag": "SHORT",
-    "total": 425,
+    "total": 850,
     "label_dist": {
-      "smoke": 425
+      "smoke": 425,
+      "no_smoke": 425
     },
-    "smoke_ratio_mean": 0.9613270588235303,
-    "smoke_ratio_median": 1.0,
-    "smoke_ratio_p10": 0.8333,
+    "smoke_ratio_mean": 0.4807418823529416,
+    "smoke_ratio_median": 0.4333,
+    "smoke_ratio_p10": 0.0,
     "smoke_ratio_p90": 1.0,
-    "smoke_ratio_min": 0.8333,
+    "smoke_ratio_min": 0.0,
     "smoke_ratio_max": 1.0,
+    "weight_mean": 1.0063671270588235,
+    "weight_min": 0.165825,
+    "weight_max": 2.33524,
     "phase_sample_dist": {
-      "2": 1320,
-      "3": 117,
-      "5": 2687,
-      "6": 345,
-      "4": 751,
-      "1": 780
+      "2": 2175,
+      "3": 89,
+      "5": 1724,
+      "6": 748,
+      "4": 523,
+      "1": 741
     },
     "phase_majority_window_dist": {
-      "5": 224,
-      "4": 27,
-      "2": 113,
-      "1": 38,
-      "6": 23
+      "5": 309,
+      "4": 43,
+      "2": 371,
+      "1": 47,
+      "6": 78,
+      "3": 2
     },
-    "missing_first_raw_col": 32,
+    "missing_first_raw_col": 66,
     "window_size_est": 30
   },
   "long": {
@@ -64,12 +69,19 @@
       "p10": -15.364892,
       "p90": 0.0
     },
-    "hold_duration_stats": {
+    "hold_frames_stats": {
       "min": 0.0,
       "max": 11.0,
       "mean": 2.096045197740113,
       "p10": 1.0,
       "p90": 4.0
+    },
+    "hold_seconds_stats": {
+      "min": 0.0,
+      "max": 0.366667,
+      "mean": 0.0704095903954801,
+      "p10": 0.033333,
+      "p90": 0.133333
     },
     "leave_speed_peak_stats": {
       "min": 0.0,
@@ -78,6 +90,8 @@
       "p10": 0.9729750000000005,
       "p90": 17.835325999999995
     },
+    "fps_mean": 29.89830508474576,
+    "fps_estimated_ratio": 1.0,
     "missing_first_raw_col": 28,
     "window_size_est": 75
   }

@@ -1,0 +1,64 @@
+{
+  "config": {
+    "npz": "/home/user/projects/train/train_data/slipce/windows_dense_npz.npz",
+    "split": "short",
+    "use_norm": true,
+    "hidden": 128,
+    "num_layers": 1,
+    "bidirectional": false,
+    "dropout": 0.1,
+    "epochs": 20,
+    "batch_size": 256,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "seed": 42,
+    "num_workers": 0,
+    "temporal_jitter_frames": 0,
+    "balance_by_class": true,
+    "amplify_hard_negative": false,
+    "hard_negative_factor": 1.0,
+    "val_ratio": 0.2,
+    "N": 2622,
+    "T": 30,
+    "F": 36,
+    "params": 102018,
+    "device": "cuda",
+    "model": "lstm"
+  },
+  "epochs_logged": 20,
+  "best": {
+    "epoch": 20,
+    "train_loss": 0.23940736882111593,
+    "train_acc": 0.9070543374074312,
+    "val_loss": 0.7708765454874694,
+    "val_acc": 0.7022900772458724
+  },
+  "last": {
+    "epoch": 20,
+    "train_loss": 0.23940736882111593,
+    "train_acc": 0.9070543374074312,
+    "val_loss": 0.7708765454874694,
+    "val_acc": 0.7022900772458724
+  },
+  "generalization_gap": {
+    "at_best": 0.2047642601615588,
+    "at_last": 0.2047642601615588
+  },
+  "trends": {
+    "train_loss_slope_lastK": -0.028644853688917758,
+    "train_acc_slope_lastK": 0.016258870850754874,
+    "val_loss_slope_lastK": 0.004453485956426596,
+    "val_acc_slope_lastK": 0.012722646310432566
+  },
+  "overfitting": {
+    "is_overfitting": false,
+    "score": 1,
+    "signals": {
+      "best_epoch_ratio": 1.0,
+      "cond_early_best": false,
+      "cond_loss_rebound": false,
+      "cond_gap_large": true,
+      "cond_acc_drop": false
+    }
+  }
+}

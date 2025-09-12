@@ -1,0 +1,126 @@
+{
+  "model": "tcn_attention_long",
+  "split": "long",
+  "device": "cuda",
+  "params": {
+    "tcn_channels": "128,128,256,256",
+    "tcn_kernel": 3,
+    "tcn_dropout": 0.1,
+    "tcn_dil_growth": 2,
+    "attn_type": "additive",
+    "attn_hidden": 192,
+    "mhsa_heads": 4,
+    "fc_hidden": 192,
+    "fc_dropout": 0.3
+  },
+  "data": {
+    "N": 1276,
+    "T": 75,
+    "F": 36
+  },
+  "core_metrics": {
+    "best": {
+      "epoch": 14,
+      "train_loss": 0.5307485799831462,
+      "train_acc": 0.7335945151811949,
+      "val_loss": 0.6363469958305359,
+      "val_acc": 0.6392156862745098
+    },
+    "last": {
+      "epoch": 100,
+      "train_loss": 0.02758225325009732,
+      "train_acc": 0.9843290891283056,
+      "val_loss": 2.1360790729522705,
+      "val_acc": 0.6
+    },
+    "generalization_gap": {
+      "at_best": -0.10559841584738971,
+      "at_last": -2.1084968197021734
+    },
+    "top_k": [
+      {
+        "epoch": 14,
+        "train_loss": 0.5307485799831462,
+        "train_acc": 0.7335945151811949,
+        "val_loss": 0.6363469958305359,
+        "val_acc": 0.6392156862745098
+      },
+      {
+        "epoch": 13,
+        "train_loss": 0.5640188843799968,
+        "train_acc": 0.683643486777669,
+        "val_loss": 0.640442430973053,
+        "val_acc": 0.6470588235294118
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.6102745035019257,
+        "train_acc": 0.6611165523996082,
+        "val_loss": 0.6416242718696594,
+        "val_acc": 0.6509803921568628
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.5987932121018121,
+        "train_acc": 0.6552399608227228,
+        "val_loss": 0.6457865834236145,
+        "val_acc": 0.6431372549019608
+      }
+    ]
+  },
+  "monitor": {
+    "primary": "val_loss",
+    "secondary": "val_acc"
+  },
+  "trends": {
+    "train_loss_slope": -0.001054450842397933,
+    "train_acc_slope": 0.00010882576994232352,
+    "val_loss_slope": 0.048973268932766385,
+    "val_acc_slope": -0.003485838779956427
+  },
+  "overfitting": {
+    "is_overfit": true,
+    "score": 3,
+    "signals": {
+      "early_best": true,
+      "loss_rebound": true,
+      "gap_large": false,
+      "acc_drop": true,
+      "best_epoch_ratio": 0.14
+    }
+  },
+  "hparams": {
+    "model": "tcn_attention_long",
+    "split": "long",
+    "device": "cuda",
+    "num_params": 991043,
+    "epochs": 100,
+    "batch_size": 256,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "seed": 42,
+    "use_norm": true,
+    "balance_by_class": true,
+    "amplify_hard_negative": true,
+    "hard_negative_factor": 1.5,
+    "temporal_jitter_frames": 0,
+    "val_ratio": 0.2,
+    "num_workers": 0,
+    "params": {
+      "tcn_channels": "128,128,256,256",
+      "tcn_kernel": 3,
+      "tcn_dropout": 0.1,
+      "tcn_dil_growth": 2,
+      "attn_type": "additive",
+      "attn_hidden": 192,
+      "mhsa_heads": 4,
+      "fc_hidden": 192,
+      "fc_dropout": 0.3
+    },
+    "data": {
+      "N": 1276,
+      "T": 75,
+      "F": 36
+    }
+  }
+}

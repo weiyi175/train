@@ -1,0 +1,58 @@
+experiment:
+  name: videoswin_long_smoke
+  output_root: result_mod
+
+data:
+  npz_path: /home/user/projects/train/train_data/slipce/windows_dense_npz.npz  # 使用既有 long window npz
+  split: long
+  use_norm: true
+  temporal_jitter: 2
+  balance_by_class: true
+  amplify_hard_negative: false
+  hard_negative_factor: 1.2
+  batch_size_micro: 4          # micro batch (實際 GPU 一次 forward)
+  accumulation_steps: 32       # 等效總 batch = 4 * 32 = 128
+  num_workers: 0
+  feature_grid: [6, 6]         # 將 36 維特徵 reshape 成 6x6 pseudo spatial grid
+  replicate_channels: 3        # 轉成類 RGB
+
+model:
+  type: videoswin3d_feature
+  in_chans: 3
+  embed_dim: 96
+  depths: [2, 2, 6, 2]
+  num_heads: [3, 6, 12, 24]
+  window_size: [2, 7, 7]     # (T,H,W)
+  mlp_ratio: 4.0
+  drop_rate: 0.0
+  attn_drop_rate: 0.0
+  drop_path_rate: 0.1
+  num_classes: 2
+  use_checkpoint: true
+
+training:
+  epochs: 40
+  lr: 5.0e-4
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+  grad_clip: 5.0
+  label_smoothing: 0.05
+  use_amp: true
+  seed: 42
+  early_stop_patience: 0
+
+scheduler:
+  type: cosine
+  warmup_epochs: 5
+  min_lr: 1.0e-6
+
+checkpointing:
+  layers_to_ckpt:
+    - stages.0
+    - stages.1
+    - stages.2
+
+log:
+  print_freq: 50
+  val_interval: 1
+  save_top_k: 1

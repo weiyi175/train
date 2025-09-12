@@ -1,0 +1,8 @@
+[2025-09-12 01:10:58] Run dir: /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/01_metrics_test
+[2025-09-12 01:11:02] Epoch 1 Step 50/256 loss=4.9269
+[2025-09-12 01:11:06] Epoch 1 Step 100/256 loss=3.2178
+[2025-09-12 01:11:09] Epoch 1 Step 150/256 loss=1.6094
+[2025-09-12 01:11:13] Epoch 1 Step 200/256 loss=0.8857
+[2025-09-12 01:11:17] Epoch 1 Step 250/256 loss=1.0420
+[2025-09-12 01:11:18] E001 train_loss=1.7694 acc=0.5260 | val_loss=0.9533 acc=0.4039 f1=0.5128 auc=0.3732
+[2025-09-12 01:11:19] Best val_acc=0.4039 @ epoch 1

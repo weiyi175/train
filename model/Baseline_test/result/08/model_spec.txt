@@ -1,0 +1,14 @@
+StatPoolMLP(
+  (net): Sequential(
+    (0): LayerNorm((72,), eps=1e-05, elementwise_affine=True)
+    (1): Linear(in_features=72, out_features=256, bias=True)
+    (2): ReLU(inplace=True)
+    (3): Dropout(p=0.1, inplace=False)
+    (4): Linear(in_features=256, out_features=256, bias=True)
+    (5): ReLU(inplace=True)
+    (6): Dropout(p=0.1, inplace=False)
+    (7): Linear(in_features=256, out_features=2, bias=True)
+  )
+)
+
+Params: 85138

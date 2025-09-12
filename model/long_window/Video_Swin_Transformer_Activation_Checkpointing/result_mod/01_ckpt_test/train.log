@@ -1,0 +1,8 @@
+[2025-09-12 01:33:08] Run dir: /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/01_ckpt_test
+[2025-09-12 01:33:13] Epoch 1 Step 50/256 loss=4.9307
+[2025-09-12 01:33:17] Epoch 1 Step 100/256 loss=3.2182
+[2025-09-12 01:33:21] Epoch 1 Step 150/256 loss=1.6070
+[2025-09-12 01:33:26] Epoch 1 Step 200/256 loss=0.8851
+[2025-09-12 01:33:30] Epoch 1 Step 250/256 loss=1.0422
+[2025-09-12 01:33:32] E001 train_loss=1.7695 acc=0.5260 | val_loss=0.9511 acc=0.4039 f1=0.5097 auc=0.3734 cm=[tn:24, fp:142, fn:10, tp:79]
+[2025-09-12 01:33:32] Best val_f1=0.5097 @ epoch 1

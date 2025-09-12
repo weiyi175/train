@@ -1,0 +1,112 @@
+{
+  "model": "tcn_attention_long",
+  "split": "long",
+  "device": "cuda",
+  "params": {
+    "tcn_channels": "128,128,256,256",
+    "tcn_kernel": 3,
+    "tcn_dropout": 0.2,
+    "tcn_dil_growth": 2,
+    "attn_type": "additive",
+    "attn_hidden": 192,
+    "mhsa_heads": 4,
+    "fc_hidden": 192,
+    "fc_dropout": 0.4
+  },
+  "data": {
+    "N": 1276,
+    "T": 75,
+    "F": 36
+  },
+  "core_metrics": {
+    "best": {
+      "epoch": 2,
+      "train_loss": 0.6675900513932007,
+      "train_acc": 0.5866797257590598,
+      "val_loss": 0.6665310635286219,
+      "val_acc": 0.5843137254901961
+    },
+    "last": {
+      "epoch": 2,
+      "train_loss": 0.6675900513932007,
+      "train_acc": 0.5866797257590598,
+      "val_loss": 0.6665310635286219,
+      "val_acc": 0.5843137254901961
+    },
+    "generalization_gap": {
+      "at_best": 0.0010589878645788087,
+      "at_last": 0.0010589878645788087
+    },
+    "top_k": [
+      {
+        "epoch": 2,
+        "train_loss": 0.6675900513932007,
+        "train_acc": 0.5866797257590598,
+        "val_loss": 0.6665310635286219,
+        "val_acc": 0.5843137254901961
+      },
+      {
+        "epoch": 1,
+        "train_loss": 0.6928004161267743,
+        "train_acc": 0.5239960822722821,
+        "val_loss": 0.6791484068421757,
+        "val_acc": 0.6
+      }
+    ]
+  },
+  "monitor": {
+    "primary": "val_loss",
+    "secondary": "val_acc"
+  },
+  "trends": {
+    "train_loss_slope": -0.02521036473357363,
+    "train_acc_slope": 0.06268364348677768,
+    "val_loss_slope": -0.012617343313553797,
+    "val_acc_slope": -0.015686274509803866
+  },
+  "overfitting": {
+    "is_overfit": false,
+    "score": 0,
+    "signals": {
+      "early_best": false,
+      "loss_rebound": false,
+      "gap_large": false,
+      "acc_drop": false,
+      "best_epoch_ratio": 1.0
+    }
+  },
+  "hparams": {
+    "model": "tcn_attention_long",
+    "split": "long",
+    "device": "cuda",
+    "num_params": 991043,
+    "epochs": 2,
+    "batch_size": 64,
+    "lr": 5e-05,
+    "weight_decay": 0.0001,
+    "seed": 42,
+    "use_norm": true,
+    "balance_by_class": true,
+    "amplify_hard_negative": false,
+    "hard_negative_factor": 1.5,
+    "temporal_jitter_frames": 2,
+    "val_ratio": 0.2,
+    "num_workers": 0,
+    "params": {
+      "tcn_channels": "128,128,256,256",
+      "tcn_kernel": 3,
+      "tcn_dropout": 0.2,
+      "tcn_dil_growth": 2,
+      "attn_type": "additive",
+      "attn_hidden": 192,
+      "mhsa_heads": 4,
+      "fc_hidden": 192,
+      "fc_dropout": 0.4
+    },
+    "data": {
+      "N": 1276,
+      "T": 75,
+      "F": 36
+    }
+  }
+}

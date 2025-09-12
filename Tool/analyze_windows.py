@@ -48,6 +48,15 @@ def analyze(rows: List[Dict[str,str]], tag: str, sample_n: int) -> Dict[str,Any]
         'smoke_ratio_min': min(ratios),
         'smoke_ratio_max': max(ratios),
     })
+    # optional: weight for short windows
+    if 'weight' in rows[0]:
+        try:
+            ws=[float(r.get('weight','1.0') or 1.0) for r in rows]
+            out['weight_mean']=sum(ws)/len(ws)
+            out['weight_min']=min(ws)
+            out['weight_max']=max(ws)
+        except Exception:
+            pass
     # detect phase columns
     phase_cols=[c for c in rows[0].keys() if c.startswith('phase_t')]
     if phase_cols:
@@ -73,7 +82,13 @@ def analyze(rows: List[Dict[str,str]], tag: str, sample_n: int) -> Dict[str,Any]
         def collect(name):
             return [float(r[name]) for r in rows if r.get(name,'')!='']
         aps=collect('approach_speed_peak')
-        hds=collect('hold_duration')
+        # support both legacy and new names
+        if 'hold_duration' in rows[0]:
+            hfs=collect('hold_duration')
+            out['hold_frames_stats']={}
+        else:
+            hfs=collect('hold_frames') if 'hold_frames' in rows[0] else []
+        hss=collect('hold_seconds') if 'hold_seconds' in rows[0] else []
         lps=collect('leave_speed_peak')
         def stat(arr):
             if not arr: return {}
@@ -82,8 +97,21 @@ def analyze(rows: List[Dict[str,str]], tag: str, sample_n: int) -> Dict[str,Any]
                 'p10': percentile(arr,0.10), 'p90': percentile(arr,0.90)
             }
         out['approach_speed_peak_stats']=stat(aps)
-        out['hold_duration_stats']=stat(hds)
+        if hfs:
+            out['hold_frames_stats']=stat(hfs)
+        if hss:
+            out['hold_seconds_stats']=stat(hss)
         out['leave_speed_peak_stats']=stat(lps)
+        # fps fields if present
+        if 'fps' in rows[0]:
+            try:
+                fps_vals=[float(r['fps']) for r in rows if r.get('fps','')!='']
+                out['fps_mean']=sum(fps_vals)/len(fps_vals) if fps_vals else None
+                if 'fps_estimated' in rows[0]:
+                    est_ct=sum(1 for r in rows if r.get('fps_estimated','0') in ('1','True','true'))
+                    out['fps_estimated_ratio']=est_ct/len(rows)
+            except Exception:
+                pass
     # missing check for first raw feature column
     first_raw=[c for c in rows[0].keys() if c.endswith('_raw_t0')]
     if first_raw:

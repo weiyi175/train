@@ -1,0 +1,92 @@
+{
+  "model": "tcn_attention",
+  "split": "short",
+  "device": "cuda",
+  "params": {
+    "tcn_channels": "128,128,128",
+    "tcn_kernel": 5,
+    "tcn_dropout": 0.1,
+    "tcn_dil_growth": 2,
+    "attn_type": "additive",
+    "attn_hidden": 128,
+    "mhsa_heads": 4,
+    "fc_hidden": 128,
+    "fc_dropout": 0.2
+  },
+  "data": {
+    "N": 2622,
+    "T": 30,
+    "F": 36
+  },
+  "core_metrics": {
+    "best": {
+      "epoch": 69,
+      "train_loss": 0.027009333800826332,
+      "train_acc": 0.9857006673021925,
+      "val_loss": 1.0675283497526447,
+      "val_acc": 0.7881679389312977
+    },
+    "last": {
+      "epoch": 100,
+      "train_loss": 0.03281668809333992,
+      "train_acc": 0.9842707340324118,
+      "val_loss": 1.2033644432329949,
+      "val_acc": 0.7480916030534351
+    },
+    "generalization_gap": {
+      "at_best": -1.0405190159518183,
+      "at_last": -1.170547755139655
+    }
+  },
+  "trends": {
+    "train_loss_slope": -0.0006087307819516372,
+    "train_acc_slope": 0.0003707234403135251,
+    "val_loss_slope": 0.022191700235679044,
+    "val_acc_slope": 0.0004240882103477592
+  },
+  "overfitting": {
+    "is_overfit": true,
+    "score": 2,
+    "signals": {
+      "early_best": false,
+      "loss_rebound": true,
+      "gap_large": false,
+      "acc_drop": true,
+      "best_epoch_ratio": 0.69
+    }
+  },
+  "hparams": {
+    "model": "tcn_attention",
+    "split": "short",
+    "device": "cuda",
+    "num_params": 473091,
+    "epochs": 100,
+    "batch_size": 256,
+    "lr": 0.0005,
+    "weight_decay": 0.0001,
+    "seed": 42,
+    "use_norm": true,
+    "balance_by_class": true,
+    "amplify_hard_negative": true,
+    "hard_negative_factor": 1.5,
+    "temporal_jitter_frames": 0,
+    "val_ratio": 0.2,
+    "num_workers": 0,
+    "params": {
+      "tcn_channels": "128,128,128",
+      "tcn_kernel": 5,
+      "tcn_dropout": 0.1,
+      "tcn_dil_growth": 2,
+      "attn_type": "additive",
+      "attn_hidden": 128,
+      "mhsa_heads": 4,
+      "fc_hidden": 128,
+      "fc_dropout": 0.2
+    },
+    "data": {
+      "N": 2622,
+      "T": 30,
+      "F": 36
+    }
+  }
+}

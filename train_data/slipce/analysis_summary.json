@@ -1,0 +1,97 @@
+{
+  "short": {
+    "tag": "SHORT",
+    "total": 2622,
+    "label_dist": {
+      "smoke": 1311,
+      "no_smoke": 1311
+    },
+    "smoke_ratio_mean": 0.4810420289855081,
+    "smoke_ratio_median": 0.43335,
+    "smoke_ratio_p10": 0.0,
+    "smoke_ratio_p90": 1.0,
+    "smoke_ratio_min": 0.0,
+    "smoke_ratio_max": 1.0,
+    "weight_mean": 0.988367658276125,
+    "weight_min": 0.5,
+    "weight_max": 1.0,
+    "phase_sample_dist": {
+      "5": 1958,
+      "6": 326,
+      "2": 2725,
+      "3": 72,
+      "4": 373,
+      "1": 546
+    },
+    "phase_majority_window_dist": {
+      "5": 918,
+      "2": 1090,
+      "6": 244,
+      "4": 149,
+      "1": 221
+    },
+    "missing_first_raw_col": 483,
+    "window_size_est": 30
+  },
+  "long": {
+    "tag": "LONG",
+    "total": 1276,
+    "label_dist": {
+      "no_smoke": 752,
+      "smoke": 524
+    },
+    "smoke_ratio_mean": 0.40857884012539164,
+    "smoke_ratio_median": 0.3867,
+    "smoke_ratio_p10": 0.0,
+    "smoke_ratio_p90": 1.0,
+    "smoke_ratio_min": 0.0,
+    "smoke_ratio_max": 1.0,
+    "phase_sample_dist": {
+      "1": 1020,
+      "2": 6318,
+      "3": 303,
+      "4": 1028,
+      "5": 4950,
+      "6": 1381
+    },
+    "phase_majority_window_dist": {
+      "5": 467,
+      "2": 559,
+      "1": 110,
+      "4": 48,
+      "6": 92
+    },
+    "approach_speed_peak_stats": {
+      "min": -60.911075,
+      "max": 2.430521,
+      "mean": -4.530468633228838,
+      "p10": -11.394287,
+      "p90": 0.0
+    },
+    "hold_frames_stats": {
+      "min": 0.0,
+      "max": 9.0,
+      "mean": 1.957680250783699,
+      "p10": 1.0,
+      "p90": 4.0
+    },
+    "hold_seconds_stats": {
+      "min": 0.0,
+      "max": 0.32,
+      "mean": 0.06762798667711513,
+      "p10": 0.033333,
+      "p90": 0.133333
+    },
+    "leave_speed_peak_stats": {
+      "min": 0.0,
+      "max": 42.508,
+      "mean": 5.223872696708466,
+      "p10": 0.18193399999999998,
+      "p90": 12.772908999999999
+    },
+    "fps_mean": 28.961598746081506,
+    "fps_estimated_ratio": 1.0,
+    "missing_first_raw_col": 230,
+    "window_size_est": 75
+  }
+}
