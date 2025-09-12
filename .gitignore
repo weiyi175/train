@@ -1,4 +1,7 @@
-# 排除 .mp4
+# 排除備份這些副檔名
 *.mp4
+*.ckpt
+*.pt
+*.onnx
 # 排除 VSCode 設定
 .vscode/
