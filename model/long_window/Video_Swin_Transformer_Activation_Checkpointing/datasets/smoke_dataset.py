@@ -44,6 +44,9 @@ class SmokeLongWindowPseudoVideo(Dataset):
             x_t = torch.from_numpy(x).float()
         else:
             x_t = x.float()
+        # 將 NaN 位置填 0（保留模型穩定性，真正 padding/缺失已由 mask 攝入統計時處理）
+        if torch.isnan(x_t).any():
+            x_t = torch.nan_to_num(x_t, nan=0.0, posinf=0.0, neginf=0.0)
         # Normalize orientation: we choose smaller dimension as feature dim if ambiguous.
         if x_t.shape[0] == self.H * self.W and x_t.shape[1] != self.H * self.W:
             x_t = x_t.t()  # (F,T)->(T,F)
@@ -73,7 +76,7 @@ class SmokeLongWindowPseudoVideo(Dataset):
 
 def build_dataloaders(npz_path: str, batch_size_micro: int, val_ratio: float, seed: int, num_workers: int,
                       balance_by_class: bool, amplify_hard_negative: bool, hard_negative_factor: float,
-                      temporal_jitter: int, feature_grid, replicate_channels: int):
+                      temporal_jitter: int, feature_grid, replicate_channels: int, use_sampler: bool = True):
     from torch.utils.data import DataLoader, Subset, WeightedRandomSampler
     ds = SmokeLongWindowPseudoVideo(npz_path=npz_path, split='long', use_norm=True,
                                     temporal_jitter=temporal_jitter, feature_grid=feature_grid,
@@ -84,20 +87,22 @@ def build_dataloaders(npz_path: str, batch_size_micro: int, val_ratio: float, se
     n_val = max(1, int(val_ratio * N))
     val_idx = perm[:n_val]; train_idx = perm[n_val:]
     train_ds, val_ds = Subset(ds, train_idx), Subset(ds, val_idx)
-    # class balancing weights
+    # class balancing weights (optional)
     import numpy as np
     ys = np.array([ds[i]['label'] for i in train_idx], dtype=np.int64)
     base_w = np.array([float(ds[i]['weight']) for i in train_idx], dtype=np.float32)
-    sw = np.ones_like(base_w, dtype=np.float32)
-    if balance_by_class:
-        cnt = np.bincount(ys, minlength=2).astype(np.float32)
-        cw = 1.0 / np.maximum(cnt, 1.0)
-        cw = cw / cw.sum() * 2.0
-        sw *= cw[ys]
-    if amplify_hard_negative:
-        hn = base_w < 1.0
-        sw[hn] *= float(hard_negative_factor)
-    sampler = WeightedRandomSampler(weights=torch.tensor(sw), num_samples=len(sw), replacement=True)
+    sampler = None
+    if use_sampler and (balance_by_class or amplify_hard_negative):
+        sw = np.ones_like(base_w, dtype=np.float32)
+        if balance_by_class:
+            cnt = np.bincount(ys, minlength=2).astype(np.float32)
+            cw = 1.0 / np.maximum(cnt, 1.0)
+            cw = cw / cw.sum() * 2.0
+            sw *= cw[ys]
+        if amplify_hard_negative:
+            hn = base_w < 1.0
+            sw[hn] *= float(hard_negative_factor)
+        sampler = WeightedRandomSampler(weights=torch.tensor(sw), num_samples=len(sw), replacement=True)
 
     def collate(batch):
         frames = torch.stack([b['frames'] for b in batch], 0)  # (B,T,C,H,W)
@@ -105,12 +110,14 @@ def build_dataloaders(npz_path: str, batch_size_micro: int, val_ratio: float, se
         weights = torch.tensor([b['weight'] for b in batch], dtype=torch.float32)
         return {'frames': frames, 'label': labels, 'weight': weights}
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size_micro, sampler=sampler,
+    train_loader = DataLoader(train_ds, batch_size=batch_size_micro, shuffle=(sampler is None), sampler=sampler,
                               num_workers=num_workers, pin_memory=True, collate_fn=collate)
     val_loader = DataLoader(val_ds, batch_size=batch_size_micro, shuffle=False,
                             num_workers=num_workers, pin_memory=True, collate_fn=collate)
     sample = ds[0]['frames']
-    meta = {'T': sample.shape[0], 'C': sample.shape[1], 'H': sample.shape[2], 'W': sample.shape[3], 'N': N}
+    class_counts = np.bincount(ys, minlength=2)
+    meta = {'T': sample.shape[0], 'C': sample.shape[1], 'H': sample.shape[2], 'W': sample.shape[3], 'N': N,
+            'train_class_counts': class_counts}
     return train_loader, val_loader, meta
 
 __all__ = ['SmokeLongWindowPseudoVideo', 'build_dataloaders']
