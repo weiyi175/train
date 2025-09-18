@@ -1,0 +1,8 @@
+Focal sweep -> epochs=10 batch=16 acc=8 mask_threshold=0.6
+Class weights: 1.0:1.0 1.0:0.8
+Focal grid (alpha,gamma): 0.25,1.5 0.25,2.0
+# Wed Sep 17 02:46:02 CST 2025 -> class_weight=1.0:1.0, alpha=0.25, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep_smoke/cw01_fg01
+# Wed Sep 17 02:46:26 CST 2025 -> class_weight=1.0:1.0, alpha=0.25, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep_smoke/cw01_fg02
+# Wed Sep 17 02:46:50 CST 2025 -> class_weight=1.0:0.8, alpha=0.25, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep_smoke/cw02_fg01
+# Wed Sep 17 02:47:12 CST 2025 -> class_weight=1.0:0.8, alpha=0.25, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep_smoke/cw02_fg02
+Focal sweep finished. Results in /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep_smoke

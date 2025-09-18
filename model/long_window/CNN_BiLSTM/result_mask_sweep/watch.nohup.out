@@ -1,0 +1,20 @@
+Watcher started. Waiting for results.json of 4 runs...
+Waiting for result_mask_sweep/run_01/01/results.json
+Found: result_mask_sweep/run_01/01/results.json
+Waiting for result_mask_sweep/run_02/01/results.json
+Found: result_mask_sweep/run_02/01/results.json
+Waiting for result_mask_sweep/run_03/01/results.json
+Found: result_mask_sweep/run_03/01/results.json
+Waiting for result_mask_sweep/run_04/01/results.json
+Found: result_mask_sweep/run_04/01/results.json
+All runs completed. Aggregating...
+Wrote 6 rows -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/aggregate.csv
+Top 5 by test_composite:
+th=0.6 gate=0.65 test_comp=0.1114 (auc=0.5048, f1=0.0189, rec=0.0095) -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_01/01
+th=0.6 gate=0.65 test_comp=0.1114 (auc=0.5048, f1=0.0189, rec=0.0095) -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_01/02
+th=0.75 gate=0.65 test_comp=0.1114 (auc=0.5048, f1=0.0189, rec=0.0095) -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_02/02
+th=0.8 gate=0.65 test_comp=0.1114 (auc=0.5048, f1=0.0189, rec=0.0095) -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_03/01
+th=0.85 gate=0.65 test_comp=0.1114 (auc=0.5048, f1=0.0189, rec=0.0095) -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_04/01
+No results found in /home/user/projects/train/model/long_window/CNN_BiLSTM/./result_mask_sweep
+Report written to /home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/report.md
+Aggregation done. See result_mask_sweep/aggregate.csv and result_mask_sweep/report.md

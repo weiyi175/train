@@ -16,7 +16,8 @@ def apply_activation_checkpointing(model: nn.Module, layer_prefixes):
             if hasattr(module, 'forward'):
                 orig_forward = module.forward
                 def wrapped_forward(*args, _orig=orig_forward, **kwargs):
-                    return checkpoint(_orig, *args, **kwargs)
+                    # Explicit use_reentrant=False to avoid deprecation warning
+                    return checkpoint(_orig, *args, use_reentrant=False, **kwargs)
                 module.forward = wrapped_forward  # type: ignore
     return model
 

@@ -1,0 +1,66 @@
+{
+  "test": {
+    "auc": 0.5294228949858087,
+    "f1": 0.3253012048192771,
+    "recall": 0.2571428571428571,
+    "TP": 27,
+    "FP": 34,
+    "FN": 78,
+    "TN": 117
+  },
+  "top_epochs": [
+    {
+      "epoch": 49,
+      "auc": 0.5841509433962264,
+      "f1": 0.48,
+      "recall": 0.4528301886792453,
+      "score": 0.500377358490566,
+      "TP": 24,
+      "FP": 23,
+      "FN": 29,
+      "TN": 52
+    },
+    {
+      "epoch": 96,
+      "auc": 0.5803773584905662,
+      "f1": 0.47058823529411764,
+      "recall": 0.4528301886792453,
+      "score": 0.4964217536071033,
+      "TP": 24,
+      "FP": 25,
+      "FN": 29,
+      "TN": 50
+    },
+    {
+      "epoch": 95,
+      "auc": 0.5783647798742138,
+      "f1": 0.47058823529411764,
+      "recall": 0.4528301886792453,
+      "score": 0.49581798002219757,
+      "TP": 24,
+      "FP": 25,
+      "FN": 29,
+      "TN": 50
+    },
+    {
+      "epoch": 86,
+      "auc": 0.5761006289308177,
+      "f1": 0.47058823529411764,
+      "recall": 0.4528301886792453,
+      "score": 0.4951387347391787,
+      "TP": 24,
+      "FP": 25,
+      "FN": 29,
+      "TN": 50
+    }
+  ],
+  "params": {
+    "arch": "gated",
+    "filters": 64,
+    "kernel": 3,
+    "dropout": 0.2,
+    "attn_units": 32,
+    "gate_type": "vector_sigmoid"
+  },
+  "cmd": "python train_tcn_residual.py --windows /home/user/projects/train/train_data/slipce/windows_npz.npz --window_type long --arch gated --attn_units 32 --gate_type vector_sigmoid --epochs 100 --batch 64 --filters 64 --kernel 3 --dropout 0.2 --result_dir /home/user/projects/train/model/long_window/TCN_Residual/result --use_layernorm --focal_alpha 0.25 --focal_gamma_start 0.0 --focal_gamma_end 1.5 --curriculum_epochs 20 --no_early_stop --run_seed 24"
+}

@@ -1,0 +1,10 @@
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::656	3.157907
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::424	2.400709
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::1165	2.158368
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::832	2.128711
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::931	2.126983
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::596	2.114128
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::346	2.109292
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::291	2.094786
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::1016	2.084773
+/home/user/projects/train/train_data/slipce/windows_npz.npz::long::1022	2.079412

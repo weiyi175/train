@@ -20,19 +20,44 @@ TOOL = ROOT / 'Tool'
 if str(TOOL) not in sys.path:
     sys.path.append(str(TOOL))
 from dataset_npz import WindowsNPZDataset  # type: ignore
+try:
+    from feature_modules.feature_pack import FeaturePackBuilder, FeaturePackConfig  # type: ignore
+except Exception:  # graceful degradation if not present
+    FeaturePackBuilder = None  # type: ignore
+    FeaturePackConfig = None  # type: ignore
 
 
 class SmokeLongWindowPseudoVideo(Dataset):
     def __init__(self, npz_path: str, split: str = 'long', use_norm: bool = True, temporal_jitter: int = 0,
-                 feature_grid=(6, 6), replicate_channels: int = 3):
+                 feature_grid=(6, 6), replicate_channels: int = 3,
+                 use_feature_pack: bool = False,
+                 fp_velocity: bool = True, fp_accel: bool = True, fp_energy: bool = True, fp_pairwise: bool = True,
+                 fp_joints: int = 15, fp_dims_per_joint: int = 4, fp_pairwise_subset: int = 20):
         self.base = WindowsNPZDataset(npz_path=npz_path, split=split, use_norm=use_norm,
                                       temporal_jitter_frames=temporal_jitter)
+        self.use_feature_pack = bool(use_feature_pack and FeaturePackBuilder is not None)
         self.H, self.W = feature_grid
-        self.C = replicate_channels
+        self.replicate_channels = replicate_channels
+        self.builder = None
+        if self.use_feature_pack:
+            # 建立 FeaturePackConfig
+            cfg = FeaturePackConfig(
+                use_velocity=fp_velocity,
+                use_accel=fp_accel,
+                use_energy=fp_energy,
+                use_pairwise=fp_pairwise,
+                joints=fp_joints,
+                dims_per_joint=fp_dims_per_joint,
+                pairwise_subset=fp_pairwise_subset
+            ) if FeaturePackConfig else None
+            if cfg and FeaturePackBuilder:
+                self.builder = FeaturePackBuilder(cfg)
+        # 基礎形狀檢查：只有在未啟用 feature pack 時才強制 F == H*W
         sample_shape = self.base[0]['x'].shape  # could be (T,F) or (F,T)
         feat_dim_candidate = sample_shape[1] if sample_shape[1] <= sample_shape[0] else sample_shape[0]
-        assert self.H * self.W == feat_dim_candidate, (
-            f"feature_grid 面積需等於特徵維度數: grid={self.H*self.W} sample_shape={sample_shape}")
+        if not self.use_feature_pack:
+            assert self.H * self.W == feat_dim_candidate, (
+                f"feature_grid 面積需等於特徵維度數: grid={self.H*self.W} sample_shape={sample_shape}")
 
     def __len__(self):
         return len(self.base)
@@ -44,27 +69,30 @@ class SmokeLongWindowPseudoVideo(Dataset):
             x_t = torch.from_numpy(x).float()
         else:
             x_t = x.float()
-        # 將 NaN 位置填 0（保留模型穩定性，真正 padding/缺失已由 mask 攝入統計時處理）
         if torch.isnan(x_t).any():
             x_t = torch.nan_to_num(x_t, nan=0.0, posinf=0.0, neginf=0.0)
-        # Normalize orientation: we choose smaller dimension as feature dim if ambiguous.
+        # 將資料轉為 (T,F)
+        if x_t.ndim != 2:
+            x_t = x_t.view(x_t.shape[0], -1)
         if x_t.shape[0] == self.H * self.W and x_t.shape[1] != self.H * self.W:
-            x_t = x_t.t()  # (F,T)->(T,F)
+            x_t = x_t.t()
         elif x_t.shape[1] == self.H * self.W:
-            pass  # already (T,F)
-        elif x_t.shape[0] == self.H * self.W and x_t.shape[1] == self.H * self.W:
-            # square; assume time on axis0
             pass
-        else:
-            # fallback: if second dim larger, transpose
+        elif not self.use_feature_pack:
+            # 只有在非 feature pack 模式才強制
             if x_t.shape[0] < x_t.shape[1]:
-                x_t = x_t  # (T,F) already
+                x_t = x_t
             else:
                 x_t = x_t.t()
-        T, F = x_t.shape
-        x_t = x_t.view(T, self.H, self.W).unsqueeze(1)  # (T,1,H,W)
-        if self.C > 1:
-            x_t = x_t.repeat(1, self.C, 1, 1)  # (T,C,H,W)
+        # Feature pack 模式：建立多組特徵後 pack 成 (T,C,H,W)
+        if self.use_feature_pack and self.builder is not None:
+            feat_dict = self.builder.build(x_t)  # 各 component: (T, Fk)
+            x_t = self.builder.pack_for_model(feat_dict, (self.H, self.W))  # (T,C,H,W)
+        else:
+            T, F = x_t.shape
+            x_t = x_t.view(T, self.H, self.W).unsqueeze(1)  # (T,1,H,W)
+            if self.replicate_channels > 1:
+                x_t = x_t.repeat(1, self.replicate_channels, 1, 1)
         y = int(item['y'])
         w = float(item.get('weight', 1.0))
         return {
@@ -76,11 +104,18 @@ class SmokeLongWindowPseudoVideo(Dataset):
 
 def build_dataloaders(npz_path: str, batch_size_micro: int, val_ratio: float, seed: int, num_workers: int,
                       balance_by_class: bool, amplify_hard_negative: bool, hard_negative_factor: float,
-                      temporal_jitter: int, feature_grid, replicate_channels: int, use_sampler: bool = True):
+                      temporal_jitter: int, feature_grid, replicate_channels: int, use_sampler: bool = True,
+                      use_feature_pack: bool = False,
+                      fp_velocity: bool = True, fp_accel: bool = True, fp_energy: bool = True, fp_pairwise: bool = True,
+                      fp_joints: int = 15, fp_dims_per_joint: int = 4, fp_pairwise_subset: int = 20):
     from torch.utils.data import DataLoader, Subset, WeightedRandomSampler
-    ds = SmokeLongWindowPseudoVideo(npz_path=npz_path, split='long', use_norm=True,
-                                    temporal_jitter=temporal_jitter, feature_grid=feature_grid,
-                                    replicate_channels=replicate_channels)
+    ds = SmokeLongWindowPseudoVideo(
+        npz_path=npz_path, split='long', use_norm=True, temporal_jitter=temporal_jitter,
+        feature_grid=feature_grid, replicate_channels=replicate_channels,
+        use_feature_pack=use_feature_pack,
+        fp_velocity=fp_velocity, fp_accel=fp_accel, fp_energy=fp_energy, fp_pairwise=fp_pairwise,
+        fp_joints=fp_joints, fp_dims_per_joint=fp_dims_per_joint, fp_pairwise_subset=fp_pairwise_subset
+    )
     N = len(ds)
     g = torch.Generator().manual_seed(seed)
     perm = torch.randperm(N, generator=g).tolist()
@@ -116,8 +151,17 @@ def build_dataloaders(npz_path: str, batch_size_micro: int, val_ratio: float, se
                             num_workers=num_workers, pin_memory=True, collate_fn=collate)
     sample = ds[0]['frames']
     class_counts = np.bincount(ys, minlength=2)
-    meta = {'T': sample.shape[0], 'C': sample.shape[1], 'H': sample.shape[2], 'W': sample.shape[3], 'N': N,
-            'train_class_counts': class_counts}
+    meta = {
+        'T': sample.shape[0], 'C': sample.shape[1], 'H': sample.shape[2], 'W': sample.shape[3], 'N': N,
+        'train_class_counts': class_counts,
+        'use_feature_pack': use_feature_pack,
+        'feature_pack_components': {
+            'velocity': fp_velocity, 'accel': fp_accel, 'energy': fp_energy, 'pairwise': fp_pairwise
+        } if use_feature_pack else None,
+        'feature_pack_joints': fp_joints if use_feature_pack else None,
+        'feature_pack_dims_per_joint': fp_dims_per_joint if use_feature_pack else None,
+        'feature_pack_pairwise_subset': fp_pairwise_subset if use_feature_pack else None
+    }
     return train_loader, val_loader, meta
 
 __all__ = ['SmokeLongWindowPseudoVideo', 'build_dataloaders']

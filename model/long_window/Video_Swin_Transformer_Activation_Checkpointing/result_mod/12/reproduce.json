@@ -1,0 +1,128 @@
+{
+  "timestamp": "2025-09-13T01:57:15.328763Z",
+  "command": "model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/train_videoswin.py --npz_path windows_v2_all.npz --preset tiny --epochs 1 --batch 2 --layer_decay 0.9 --freeze_epochs 0 --dynamic_threshold --auto_batch_probe --no_sampler --ema_f1 0.2 --seed 13 --feature_pack --fp_components velocity,accel,energy --export_infer_cfg",
+  "git_commit": "44c2404115e815b62b7ee648d585ce8752c5c85b",
+  "python": "3.10.12",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "torch": "2.3.1+cu121",
+  "cuda_available": true,
+  "device_name": "NVIDIA GeForce RTX 4070 SUPER",
+  "seed": 13,
+  "data_npz": "/home/user/projects/train/train_data/Slipce_2/windows_v2_all.npz",
+  "data_meta": {
+    "train_class_counts": [
+      598,
+      423
+    ]
+  },
+  "feature_pack": {
+    "enabled": true,
+    "components": {
+      "velocity": true,
+      "accel": true,
+      "energy": true,
+      "pairwise": false
+    },
+    "components_flag": "velocity,accel,energy",
+    "joints": 15,
+    "dims_per_joint": 4,
+    "pairwise_subset": 20
+  },
+  "model": {
+    "preset": "tiny",
+    "window_size": [
+      2,
+      7,
+      7
+    ],
+    "depths": null,
+    "num_heads": null,
+    "embed_dim": null,
+    "drop_path_rate": null,
+    "use_checkpoint": false,
+    "param_count": 29128015,
+    "single_logit": true
+  },
+  "optimization": {
+    "epochs": 1,
+    "batch_micro": 8,
+    "accum": 1,
+    "effective_batch": 8,
+    "lr": 0.0003,
+    "weight_decay": 0.05,
+    "warmup_epochs": 2,
+    "early_patience": 6,
+    "min_delta": 0.0001,
+    "no_early_stop": false,
+    "pos_weight": 1.41371158392435,
+    "sampler_used": false,
+    "balance_by_class": false,
+    "amplify_hard_negative": false,
+    "hard_negative_factor": 2.0,
+    "temporal_jitter": 0,
+    "focal_loss": false,
+    "focal_gamma": 2.0,
+    "ema_f1_alpha": 0.2,
+    "layer_decay": 0.9,
+    "freeze_epochs": 0,
+    "dynamic_threshold": true,
+    "auto_batch_probe": true,
+    "max_probe_batch": null
+  },
+  "metrics": {
+    "best_epoch": 1,
+    "best_f1": 0.0196078431372549,
+    "best_record": {
+      "epoch": 1,
+      "loss": 0.8875895673409104,
+      "lr": 0.00014882812499999998,
+      "f1": 0.0196078431372549,
+      "auc": 0.5852513822810852,
+      "cm": [
+        [
+          154,
+          0
+        ],
+        [
+          100,
+          1
+        ]
+      ],
+      "acc": 0.6078431606292725,
+      "f1_opt": 0.5911949685534592,
+      "best_threshold": 0.3214981003322793,
+      "f1_ema": 0.0196078431372549
+    },
+    "last_record": {
+      "epoch": 1,
+      "loss": 0.8875895673409104,
+      "lr": 0.00014882812499999998,
+      "f1": 0.0196078431372549,
+      "auc": 0.5852513822810852,
+      "cm": [
+        [
+          154,
+          0
+        ],
+        [
+          100,
+          1
+        ]
+      ],
+      "acc": 0.6078431606292725,
+      "f1_opt": 0.5911949685534592,
+      "best_threshold": 0.3214981003322793,
+      "f1_ema": 0.0196078431372549
+    },
+    "best_dynamic_threshold": 0.3214981003322793,
+    "best_f1_opt": 0.5911949685534592
+  },
+  "artifacts": {
+    "history_json": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/12/history.json",
+    "best_ckpt": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/12/best.ckpt",
+    "last_ckpt": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/12/last.ckpt",
+    "threshold_history": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/12/threshold_history.json",
+    "best_threshold_txt": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/12/best_threshold.txt"
+  },
+  "notes": "Weights (.ckpt/.pt/.onnx) may be excluded from backup; this report plus seed & code commit allow retraining. Minor nondeterminism can arise from CUDA kernels unless fully deterministic settings are enforced."
+}

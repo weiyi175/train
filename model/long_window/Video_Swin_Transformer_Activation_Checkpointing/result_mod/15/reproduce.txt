@@ -1,0 +1,83 @@
+# Reproducibility Report
+Run dir: /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/15
+Timestamp (UTC): 2025-09-13T04:41:00.651367Z
+Command: model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/train_videoswin.py --preset tiny --feature_pack --fp_components velocity,accel,energy,pairwise --auto_batch_capacity --capacity_report capacity_report.json --epochs 25 --lr 3e-4 --layer_decay 0.8 --weight_decay 0.02 --dynamic_threshold --amp --use_checkpoint
+Git commit: 44c2404115e815b62b7ee648d585ce8752c5c85b
+Python: 3.10.12 Torch: 2.3.1+cu121 Device: NVIDIA GeForce RTX 4070 SUPER
+--- Model ---
+preset: tiny
+window_size: (2, 7, 7)
+depths: None
+num_heads: None
+embed_dim: None
+drop_path_rate: None
+use_checkpoint: True
+param_count: 29128015
+single_logit: True
+--- Optimization ---
+epochs: 25
+batch_micro: 64
+accum: 1
+effective_batch: 64
+lr: 0.0003
+weight_decay: 0.02
+warmup_epochs: 2
+early_patience: 6
+min_delta: 0.0001
+no_early_stop: False
+pos_weight: None
+sampler_used: False
+balance_by_class: False
+amplify_hard_negative: False
+hard_negative_factor: 2.0
+temporal_jitter: 0
+focal_loss: False
+focal_gamma: 2.0
+ema_f1_alpha: 0.2
+layer_decay: 0.8
+freeze_epochs: 0
+dynamic_threshold: True
+auto_batch_probe: False
+max_probe_batch: None
+batch_source: capacity_report
+capacity_throughput: 286.8552950618036
+capacity_peak_mem: 4922477056
+feature_pack_mode_detected: full
+--- Batch Source ---
+batch_source: capacity_report fp_mode_detected: full
+capacity_throughput(samples/s): 286.86
+capacity_peak_mem(bytes): 4922477056
+--- Feature Pack ---
+Enabled Components: velocity, accel, energy, pairwise
+joints: 15 dims_per_joint: 4 pairwise_subset: 20
+--- Best Epoch Metrics ---
+epoch: 1
+loss: 0.8488762639462948
+lr: 0.000140625
+f1: 0.5016949152542373
+auc: 0.5889400297820496
+cm: [[34, 132], [15, 74]]
+acc: 0.42352941632270813
+f1_opt: 0.5297619047619048
+best_threshold: 0.40248322741470144
+f1_ema: 0.5016949152542373
+--- Last Epoch Metrics ---
+epoch: 7
+loss: 0.5383591558784246
+lr: 0.00026727004222232997
+f1: 0.4039408866995074
+auc: 0.5097468525788548
+cm: [[93, 73], [48, 41]]
+acc: 0.5254902243614197
+f1_opt: 0.5329153605015674
+best_threshold: 0.23792186956010272
+f1_ema: 0.39925803345399424
+--- Dynamic Threshold ---
+best_threshold (epoch 7): 0.23792186956010272
+best_f1_opt: 0.5329153605015674
+--- Reproduce Command (suggested) ---
+/home/user/projects/train/.venv/bin/python /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/train_videoswin.py --npz_path /home/user/projects/train/train_data/Slipce_2/windows_v2_all.npz --preset tiny --epochs 25 --batch 64 --accum 1 --lr 0.0003 --warmup_epochs 2 --seed 42 --use_checkpoint --ema_f1 0.2 --val_ratio 0.2 --feature_pack --fp_components velocity,accel,energy,pairwise
+--- Inference Command (template) ---
+/home/user/projects/train/.venv/bin/python /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/infer_videoswin.py --run_dir /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/15 --input_npz /home/user/projects/train/train_data/Slipce_2/windows_v2_all.npz --threshold 0.237922
+--- Notes ---
+Weights (.ckpt/.pt/.onnx) may be excluded from backup; this report plus seed & code commit allow retraining. Minor nondeterminism can arise from CUDA kernels unless fully deterministic settings are enforced.

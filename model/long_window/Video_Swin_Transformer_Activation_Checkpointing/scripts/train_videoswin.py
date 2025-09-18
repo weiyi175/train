@@ -65,7 +65,9 @@ from datasets.smoke_dataset import build_dataloaders
 
 def parse_args():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--npz_path', required=True)
+    # Provide default common dataset path; if user omits and file exists we use it.
+    default_npz = Path(__file__).resolve().parents[2] / 'train_data' / 'Slipce_2' / 'windows_v2_all.npz'
+    ap.add_argument('--npz_path', default=str(default_npz), help='NPZ dataset path (defaults to common Slipce_2/windows_v2_all.npz)')
     ap.add_argument('--preset', default='tiny', help='tiny|small|base or custom if --depths provided')
     ap.add_argument('--depths', type=int, nargs='*', help='Override depths list')
     ap.add_argument('--num_heads', type=int, nargs='*', help='Override num_heads list')
@@ -103,6 +105,25 @@ def parse_args():
     ap.add_argument('--pos_weight', type=float, default=None, help='Pos class weight for BCE / CE (applies to positive class)')
     ap.add_argument('--ema_f1', type=float, default=0.2, help='Exponential moving average factor for F1 tracking (0 to disable)')
     ap.add_argument('--no_early_stop', action='store_true', help='Disable early stopping regardless of patience')
+    ap.add_argument('--dynamic_threshold', action='store_true', help='Search best F1 threshold each epoch and log')
+    ap.add_argument('--freeze_epochs', type=int, default=0, help='Freeze backbone (except head) for first N epochs')
+    ap.add_argument('--layer_decay', type=float, default=1.0, help='Layer-wise learning rate decay (1.0 disable)')
+    ap.add_argument('--auto_batch_probe', action='store_true', help='Binary search largest batch that fits GPU before training')
+    ap.add_argument('--max_probe_batch', type=int, default=None, help='Upper bound for auto probe (default=batch*4)')
+    # Capacity report driven auto batch selection
+    ap.add_argument('--auto_batch_capacity', action='store_true', help='Use an existing capacity_report.json to choose batch for this preset + feature pack mode')
+    ap.add_argument('--capacity_report', type=str, default='capacity_report.json', help='Path to capacity_report.json (used with --auto_batch_capacity)')
+    # Feature pack options
+    ap.add_argument('--feature_pack', action='store_true', help='Enable feature pack derived channels')
+    ap.add_argument('--fp_no_velocity', action='store_true')
+    ap.add_argument('--fp_no_accel', action='store_true')
+    ap.add_argument('--fp_no_energy', action='store_true')
+    ap.add_argument('--fp_no_pairwise', action='store_true')
+    ap.add_argument('--fp_components', type=str, help='Comma-separated components to include (overrides fp_no_*). Options: velocity,accel,energy,pairwise')
+    ap.add_argument('--fp_joints', type=int, default=15)
+    ap.add_argument('--fp_dims_per_joint', type=int, default=4)
+    ap.add_argument('--fp_pairwise_subset', type=int, default=20)
+    ap.add_argument('--export_infer_cfg', action='store_true', help='Export inference_config.json for deployment')
     return ap.parse_args()
 
 
@@ -114,7 +135,7 @@ def set_seed(seed: int):
     np.random.seed(seed)
 
 
-def build_model(args, num_classes: int):
+def build_model(args, num_classes: int, in_chans: int):
     overrides = {}
     if args.depths: overrides['depths'] = tuple(args.depths)
     if args.num_heads: overrides['num_heads'] = tuple(args.num_heads)
@@ -122,11 +143,22 @@ def build_model(args, num_classes: int):
     if args.drop_path_rate is not None: overrides['drop_path_rate'] = args.drop_path_rate
     if overrides:
         # Build from preset then override
-        model = build_videoswin3d_preset(args.preset, num_classes=num_classes, window_size=tuple(args.window_size),
-                                         use_checkpoint=args.use_checkpoint, **overrides)
+        model = build_videoswin3d_preset(
+            args.preset,
+            in_chans=in_chans,
+            num_classes=num_classes,
+            window_size=tuple(args.window_size),
+            use_checkpoint=args.use_checkpoint,
+            **overrides
+        )
     else:
-        model = build_videoswin3d_preset(args.preset, num_classes=num_classes, window_size=tuple(args.window_size),
-                                         use_checkpoint=args.use_checkpoint)
+        model = build_videoswin3d_preset(
+            args.preset,
+            in_chans=in_chans,
+            num_classes=num_classes,
+            window_size=tuple(args.window_size),
+            use_checkpoint=args.use_checkpoint
+        )
     return model
 
 
@@ -261,13 +293,72 @@ def evaluate(model, loader, device, single_logit: bool, debug: bool):
         valN = len(_y_np); val_pos = int(_y_np.sum()); val_neg = valN - val_pos
         print(f"[DEBUG] mode={'BCE1' if single_logit else 'SMX2'} module={module_src} valN={valN} pos={val_pos} neg={val_neg} prob_min={pr_min:.4f} prob_max={pr_max:.4f} mean={pr_mean:.4f} std={pr_std:.6f} pos_mean={pos_mean:.4f} pos_std={pos_std:.6f} neg_mean={neg_mean:.4f} neg_std={neg_std:.6f} auc={auc:.4f} rev_auc={rev_auc:.4f} manual_auc={manual_auc:.4f}")
     # ---------------------------------------
-    return {'f1':f1,'auc':auc,'cm':cm.tolist(),'acc':acc}
+    return {'f1':f1,'auc':auc,'cm':cm.tolist(),'acc':acc,'probs':pr.numpy().tolist(),'labels':y.numpy().tolist()}
 
 
 def main():
     args = parse_args()
     set_seed(args.seed)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    # Resolve feature pack component selection (centralized)
+    def _resolve_fp_components(a):
+        comps = {
+            'velocity': not a.fp_no_velocity,
+            'accel': not a.fp_no_accel,
+            'energy': not a.fp_no_energy,
+            'pairwise': not a.fp_no_pairwise,
+        }
+        if a.fp_components:
+            raw = [c.strip().lower() for c in a.fp_components.split(',') if c.strip()]
+            # allow alias
+            norm_map = {'acceleration': 'accel'}
+            sel = set(norm_map.get(c, c) for c in raw)
+            for k in comps.keys():
+                comps[k] = (k in sel)
+        return comps
+    fp_comps = _resolve_fp_components(args)
+    # Detect feature pack mode (for mapping to capacity report entries)
+    def _detect_fp_mode(fp_enabled: bool, comps: dict[str,bool]):
+        if not fp_enabled:
+            return 'off'
+        # canonical light: velocity/accel/energy True, pairwise False
+        if comps.get('velocity') and comps.get('accel') and comps.get('energy') and not comps.get('pairwise'):
+            return 'light'
+        # canonical full: all four True
+        if all(comps.get(k, False) for k in ['velocity','accel','energy','pairwise']):
+            return 'full'
+        return 'custom'
+    fp_mode_detected = _detect_fp_mode(args.feature_pack, fp_comps)
+    # Resolve npz_path if not found
+    from pathlib import Path as _P
+    npz_candidate = _P(args.npz_path)
+    if not npz_candidate.exists():
+        # search common subdirs
+        search_roots = [
+            _P.cwd(),
+            _P.cwd()/ 'train_data',
+            _P.cwd()/ 'train_data' / 'Slipce_2',
+            BASE_DIR.parent / 'train_data',
+        ]
+        found = []
+        for root in search_roots:
+            if root.exists():
+                cand = list(root.glob(npz_candidate.name))
+                if cand:
+                    found.extend(cand)
+        if not found:
+            # broader rglob (may be slower)
+            try:
+                found = list(_P.cwd().rglob(npz_candidate.name))[:1]
+            except Exception:
+                found = []
+        if found:
+            args.npz_path = str(found[0].resolve())
+            print(f"[npz_resolve] Input path not found, auto-resolved to: {args.npz_path}")
+        else:
+            print(f"[error] npz file not found: {args.npz_path}")
+            print("  提示: 提供完整路徑，例如 --npz_path /home/user/projects/train/train_data/Slipce_2/windows_v2_all.npz")
+            return
     base_out = Path(args.out)
     # Auto-increment: if base_out exists and is intended as a container, create numbered subfolder 01,02,...
     # Rule: if base_out is a directory path (whether exists or not) and does not already end with a numeric token, create next index.
@@ -293,11 +384,126 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     print(f"[run_dir] Using output directory: {out}")
 
+    # -------- Capacity report based batch selection (before building loaders) --------
+    batch_source = 'manual'
+    capacity_throughput = None
+    capacity_peak_mem = None
+    if args.auto_batch_capacity:
+        cap_path = Path(args.capacity_report)
+        if not cap_path.exists():
+            print(f"[warn] capacity_report not found at {cap_path}, ignoring --auto_batch_capacity")
+        else:
+            try:
+                cap_json = json.loads(cap_path.read_text())
+                # match preset & feature_pack_mode
+                if fp_mode_detected == 'custom':
+                    print('[warn] feature pack combination is custom; no direct match in capacity report.')
+                target = None
+                for rec in cap_json.get('results', []):
+                    if rec.get('preset') == args.preset and rec.get('feature_pack_mode') == fp_mode_detected:
+                        target = rec; break
+                if target and target.get('best'):
+                    new_batch = int(target['best']['batch'])
+                    if new_batch != args.batch:
+                        print(f"[capacity] adopting batch {new_batch} (was {args.batch}) from capacity_report ({fp_mode_detected})")
+                        args.batch = new_batch
+                    else:
+                        print(f"[capacity] batch {args.batch} already matches capacity report recommendation")
+                    capacity_throughput = target.get('throughput_samples_per_s')
+                    capacity_peak_mem = (target.get('best') or {}).get('peak')
+                    batch_source = 'capacity_report'
+                    # If capacity driven selection used, skip later probe to avoid overwrite
+                    args.auto_batch_probe = False
+                else:
+                    print(f"[warn] No matching entry in capacity_report for preset={args.preset} fp_mode={fp_mode_detected}; keeping manual batch {args.batch}")
+            except Exception as e:
+                print(f"[warn] failed to parse capacity_report.json: {e}")
+
     train_loader, val_loader, meta = build_dataloaders(
         npz_path=args.npz_path, batch_size_micro=args.batch, val_ratio=args.val_ratio, seed=args.seed,
         num_workers=args.num_workers, balance_by_class=args.balance_by_class, amplify_hard_negative=args.amplify_hard_negative,
         hard_negative_factor=args.hard_negative_factor, temporal_jitter=args.temporal_jitter, feature_grid=tuple(args.feature_grid),
-        replicate_channels=args.replicate_channels, use_sampler=(not args.no_sampler))
+        replicate_channels=args.replicate_channels, use_sampler=(not args.no_sampler),
+        use_feature_pack=args.feature_pack,
+        fp_velocity=fp_comps['velocity'], fp_accel=fp_comps['accel'], fp_energy=fp_comps['energy'], fp_pairwise=fp_comps['pairwise'],
+        fp_joints=args.fp_joints, fp_dims_per_joint=args.fp_dims_per_joint, fp_pairwise_subset=args.fp_pairwise_subset)
+
+    single_logit = (not args.softmax)
+    num_classes = 1 if single_logit else 2
+    # Determine in_chans from meta
+    in_chans = meta.get('C', args.replicate_channels) if isinstance(meta, dict) else args.replicate_channels
+    model = build_model(args, num_classes, in_chans).to(device)
+
+    # Layer-wise decay + optional freezing
+    param_groups=[]
+    if hasattr(model,'stages'):
+        blocks=[]
+        for si,stage in enumerate(model.stages):
+            for blk in stage['blocks']:
+                blocks.append(list(blk.parameters()))
+        head_params=list(model.head.parameters()) if hasattr(model,'head') else []
+        blocks.append(head_params)
+        L=len(blocks)
+        for i,plist in enumerate(blocks):
+            scale = (args.layer_decay ** (L-i-1)) if args.layer_decay!=1.0 else 1.0
+            if args.freeze_epochs>0 and i < L-1:
+                for p in plist: p.requires_grad=False
+            param_groups.append({'params':plist,'lr':args.lr*scale})
+    else:
+        plist=list(model.parameters())
+        if args.freeze_epochs>0 and hasattr(model,'head'):
+            head_set=set(model.head.parameters())
+            for p in plist:
+                if p not in head_set: p.requires_grad=False
+        param_groups.append({'params':plist,'lr':args.lr})
+    optimizer = torch.optim.AdamW(param_groups, lr=args.lr, weight_decay=args.weight_decay)
+
+    # Auto batch probe
+    if args.auto_batch_probe and device.startswith('cuda'):
+        hi = args.max_probe_batch or args.batch*4
+        lo = args.batch
+        best = lo
+        print(f"[probe] batch search in [{lo},{hi}]")
+        while lo <= hi:
+            mid = (lo+hi)//2
+            ok=True
+            try:
+                test_loader,_,_ = build_dataloaders(
+                    npz_path=args.npz_path, batch_size_micro=mid, val_ratio=args.val_ratio, seed=args.seed,
+                    num_workers=0, balance_by_class=args.balance_by_class, amplify_hard_negative=args.amplify_hard_negative,
+                    hard_negative_factor=args.hard_negative_factor, temporal_jitter=0, feature_grid=tuple(args.feature_grid),
+                    replicate_channels=args.replicate_channels, use_sampler=(not args.no_sampler),
+                    use_feature_pack=args.feature_pack,
+                    fp_velocity=fp_comps['velocity'], fp_accel=fp_comps['accel'], fp_energy=fp_comps['energy'], fp_pairwise=fp_comps['pairwise'],
+                    fp_joints=args.fp_joints, fp_dims_per_joint=args.fp_dims_per_joint, fp_pairwise_subset=args.fp_pairwise_subset)
+                for bi,b in enumerate(test_loader):
+                    x=b['frames'].to(device)
+                    with torch.cuda.amp.autocast(enabled=False):
+                        model(x)
+                    if bi>1: break
+                torch.cuda.synchronize()
+            except RuntimeError as e:
+                if 'CUDA out of memory' in str(e): ok=False
+                else: raise
+            if ok:
+                best=mid; lo=mid+1
+            else:
+                hi=mid-1
+            del test_loader; torch.cuda.empty_cache()
+        if best!=args.batch:
+            print(f"[probe] using batch {best}")
+            args.batch=best
+            train_loader, val_loader, meta = build_dataloaders(
+                npz_path=args.npz_path, batch_size_micro=args.batch, val_ratio=args.val_ratio, seed=args.seed,
+                num_workers=args.num_workers, balance_by_class=args.balance_by_class, amplify_hard_negative=args.amplify_hard_negative,
+                hard_negative_factor=args.hard_negative_factor, temporal_jitter=args.temporal_jitter, feature_grid=tuple(args.feature_grid),
+                replicate_channels=args.replicate_channels, use_sampler=(not args.no_sampler),
+                use_feature_pack=args.feature_pack,
+                fp_velocity=fp_comps['velocity'], fp_accel=fp_comps['accel'], fp_energy=fp_comps['energy'], fp_pairwise=fp_comps['pairwise'],
+                fp_joints=args.fp_joints, fp_dims_per_joint=args.fp_dims_per_joint, fp_pairwise_subset=args.fp_pairwise_subset)
+            batch_source = 'auto_probe'
+        elif batch_source != 'capacity_report':
+            batch_source = 'manual'
 
     # Auto derive pos_weight if requested (sampler disabled) and counts available
     if args.pos_weight is None and args.no_sampler:
@@ -309,12 +515,6 @@ def main():
             except Exception:
                 pass
 
-    single_logit = (not args.softmax)
-    num_classes = 1 if single_logit else 2
-    model = build_model(args, num_classes).to(device)
-
-    # Optimizer (AdamW)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     total_steps = args.epochs * len(train_loader)
     warmup_steps = args.warmup_epochs * len(train_loader)
     scaler = torch.cuda.amp.GradScaler() if args.amp and device.startswith('cuda') else None
@@ -342,11 +542,33 @@ def main():
     }
 
     ema_f1 = None
+    threshold_history=[]
     for epoch in range(1, args.epochs+1):
         start = time.time()
         loss, last_lr = train_one_epoch(model, train_loader, optimizer, scaler, device, args.accum,
                                (epoch-1)*len(train_loader), total_steps, args.lr, warmup_steps, single_logit, args.focal_loss, args.focal_gamma, args.pos_weight)
         metrics = evaluate(model, val_loader, device, single_logit, args.debug)
+        if args.dynamic_threshold:
+            import numpy as _np
+            probs=_np.array(metrics.pop('probs'))
+            labels=_np.array(metrics.pop('labels'))
+            uniq=_np.unique(probs)
+            if len(uniq)>200:
+                qs=_np.linspace(0,1,200); cands=_np.quantile(uniq,qs)
+            else:
+                cands=uniq
+            best_th=0.5; best_f1_th=-1
+            for th in cands:
+                pred=(probs>=th).astype(int)
+                tp=((pred==1)&(labels==1)).sum(); fp=((pred==1)&(labels==0)).sum(); fn=((pred==0)&(labels==1)).sum()
+                prec=tp/max(1,tp+fp); rec=tp/max(1,tp+fn)
+                f1c=0.0 if (prec+rec)==0 else 2*prec*rec/(prec+rec)
+                if f1c>best_f1_th:
+                    best_f1_th=f1c; best_th=float(th)
+            metrics['f1_opt']=best_f1_th; metrics['best_threshold']=best_th
+            threshold_history.append({'epoch':epoch,'threshold':best_th,'f1_opt':best_f1_th})
+        else:
+            metrics.pop('probs',None); metrics.pop('labels',None)
         if args.ema_f1 > 0:
             if ema_f1 is None:
                 ema_f1 = metrics['f1']
@@ -379,7 +601,9 @@ def main():
         torch.save({'model':model.state_dict(),'epoch':epoch,'metrics':metrics}, out/'last.ckpt')
         with (out/'history.json').open('w') as f:
             json.dump(history,f,indent=2)
-        extra = f" f1_ema={metrics['f1_ema']:.4f}" if 'f1_ema' in metrics else ''
+        extra=''
+        if 'f1_ema' in metrics: extra+=f" f1_ema={metrics['f1_ema']:.4f}"
+        if 'f1_opt' in metrics: extra+=f" f1_opt={metrics['f1_opt']:.4f} th={metrics['best_threshold']:.3f}"
         print(f"Epoch {epoch} loss={loss:.4f} f1={metrics['f1']:.4f}{extra} auc={metrics['auc']:.4f} acc={metrics['acc']:.4f} best_f1={best_f1:.4f} ({best_epoch}) time={time.time()-start:.1f}s")
         if (not args.no_early_stop) and patience >= args.early_patience:
             print('[EARLY STOP]')
@@ -424,6 +648,21 @@ def main():
             return [ _safe(x) for x in o ]
         return o
 
+    # Dynamic threshold summary + artifact writing
+    best_dyn = None
+    if args.dynamic_threshold and threshold_history:
+        for rec in threshold_history:
+            if best_dyn is None or rec['f1_opt'] > best_dyn['f1_opt']:
+                best_dyn = rec
+        # write history & best files
+        with (out/'threshold_history.json').open('w') as f:
+            json.dump(threshold_history, f, indent=2)
+        if best_dyn is not None:
+            with (out/'best_threshold.txt').open('w') as f:
+                f.write(f"{best_dyn['threshold']:.6f}\n")
+            with (out/'best_threshold.json').open('w') as f:
+                json.dump(best_dyn, f, indent=2)
+
     repro_json = {
         'timestamp': datetime.datetime.utcnow().isoformat() + 'Z',
         'command': ' '.join(sys.argv),
@@ -438,6 +677,14 @@ def main():
         'data_meta': {
             'train_class_counts': _safe(meta.get('train_class_counts')) if isinstance(meta, dict) else None
         },
+        'feature_pack': {
+            'enabled': args.feature_pack,
+            'components': fp_comps if args.feature_pack else None,
+            'components_flag': args.fp_components if args.feature_pack else None,
+            'joints': args.fp_joints if args.feature_pack else None,
+            'dims_per_joint': args.fp_dims_per_joint if args.feature_pack else None,
+            'pairwise_subset': args.fp_pairwise_subset if args.feature_pack else None
+        },
         'model': {
             'preset': args.preset,
             'window_size': tuple(args.window_size),
@@ -449,7 +696,7 @@ def main():
             'param_count': param_count,
             'single_logit': (not args.softmax)
         },
-        'optimization': {
+    'optimization': {
             'epochs': args.epochs,
             'batch_micro': args.batch,
             'accum': args.accum,
@@ -468,18 +715,31 @@ def main():
             'temporal_jitter': args.temporal_jitter,
             'focal_loss': args.focal_loss,
             'focal_gamma': args.focal_gamma,
-            'ema_f1_alpha': args.ema_f1
+            'ema_f1_alpha': args.ema_f1,
+            'layer_decay': args.layer_decay,
+            'freeze_epochs': args.freeze_epochs,
+            'dynamic_threshold': args.dynamic_threshold,
+            'auto_batch_probe': args.auto_batch_probe,
+            'max_probe_batch': args.max_probe_batch,
+            'batch_source': batch_source,
+            'capacity_throughput': capacity_throughput,
+            'capacity_peak_mem': capacity_peak_mem,
+            'feature_pack_mode_detected': fp_mode_detected
         },
         'metrics': {
             'best_epoch': best_epoch,
             'best_f1': best_f1,
             'best_record': best_rec,
-            'last_record': last_rec
+            'last_record': last_rec,
+            'best_dynamic_threshold': (best_dyn['threshold'] if best_dyn else None),
+            'best_f1_opt': (best_dyn['f1_opt'] if best_dyn else None)
         },
         'artifacts': {
             'history_json': str((out/'history.json').resolve()),
             'best_ckpt': str((out/'best.ckpt').resolve()),
-            'last_ckpt': str((out/'last.ckpt').resolve())
+            'last_ckpt': str((out/'last.ckpt').resolve()),
+            'threshold_history': str((out/'threshold_history.json').resolve()) if best_dyn else None,
+            'best_threshold_txt': str((out/'best_threshold.txt').resolve()) if best_dyn else None
         },
         'notes': 'Weights (.ckpt/.pt/.onnx) may be excluded from backup; this report plus seed & code commit allow retraining. Minor nondeterminism can arise from CUDA kernels unless fully deterministic settings are enforced.'
     }
@@ -499,6 +759,20 @@ def main():
     lines.append('--- Optimization ---')
     for k,v in repro_json['optimization'].items():
         lines.append(f"{k}: {v}")
+    # Capacity / batch source quick note
+    lines.append('--- Batch Source ---')
+    lines.append(f"batch_source: {repro_json['optimization'].get('batch_source')} fp_mode_detected: {repro_json['optimization'].get('feature_pack_mode_detected')}")
+    if repro_json['optimization'].get('capacity_throughput'):
+        lines.append(f"capacity_throughput(samples/s): {repro_json['optimization'].get('capacity_throughput'):.2f}")
+    if repro_json['optimization'].get('capacity_peak_mem'):
+        lines.append(f"capacity_peak_mem(bytes): {repro_json['optimization'].get('capacity_peak_mem')}")
+    if repro_json.get('feature_pack', {}).get('enabled'):
+        fp = repro_json['feature_pack']
+        comps = fp.get('components') or {}
+        enabled_list = [k for k,v in comps.items() if v]
+        lines.append('--- Feature Pack ---')
+        lines.append(f"Enabled Components: {', '.join(enabled_list) if enabled_list else 'none'}")
+        lines.append(f"joints: {fp.get('joints')} dims_per_joint: {fp.get('dims_per_joint')} pairwise_subset: {fp.get('pairwise_subset')}")
     if best_rec:
         lines.append('--- Best Epoch Metrics ---')
         for k,v in best_rec.items():
@@ -507,6 +781,10 @@ def main():
         lines.append('--- Last Epoch Metrics ---')
         for k,v in last_rec.items():
             lines.append(f"{k}: {v}")
+    if best_dyn is not None:
+        lines.append('--- Dynamic Threshold ---')
+        lines.append(f"best_threshold (epoch {best_dyn['epoch']}): {best_dyn['threshold']}")
+        lines.append(f"best_f1_opt: {best_dyn['f1_opt']}")
     lines.append('--- Reproduce Command (suggested) ---')
     reproduce_cmd = [sys.executable, __file__, f"--npz_path {args.npz_path}", f"--preset {args.preset}", f"--epochs {args.epochs}", f"--batch {args.batch}", f"--accum {args.accum}", f"--lr {args.lr}", f"--warmup_epochs {args.warmup_epochs}", f"--seed {args.seed}"]
     if args.no_sampler: reproduce_cmd.append('--no_sampler')
@@ -519,12 +797,50 @@ def main():
     if args.ema_f1 != 0: reproduce_cmd.append(f"--ema_f1 {args.ema_f1}")
     if args.temporal_jitter: reproduce_cmd.append(f"--temporal_jitter {args.temporal_jitter}")
     reproduce_cmd.append(f"--val_ratio {args.val_ratio}")
+    if args.feature_pack:
+        reproduce_cmd.append('--feature_pack')
+        if args.fp_components:
+            reproduce_cmd.append(f"--fp_components {args.fp_components}")
+        else:
+            if args.fp_no_velocity: reproduce_cmd.append('--fp_no_velocity')
+            if args.fp_no_accel: reproduce_cmd.append('--fp_no_accel')
+            if args.fp_no_energy: reproduce_cmd.append('--fp_no_energy')
+            if args.fp_no_pairwise: reproduce_cmd.append('--fp_no_pairwise')
+    if args.fp_joints != 15: reproduce_cmd.append(f"--fp_joints {args.fp_joints}")
+    if args.fp_dims_per_joint != 4: reproduce_cmd.append(f"--fp_dims_per_joint {args.fp_dims_per_joint}")
+    if args.fp_pairwise_subset != 20: reproduce_cmd.append(f"--fp_pairwise_subset {args.fp_pairwise_subset}")
     lines.append(' '.join(reproduce_cmd))
+    # Inference command template
+    infer_cmd = [sys.executable, str((BASE_DIR/'scripts'/'infer_videoswin.py')), f"--run_dir {out}", f"--input_npz {args.npz_path}"]
+    if best_dyn is not None:
+        infer_cmd.append(f"--threshold {best_dyn['threshold']:.6f}")
+    lines.append('--- Inference Command (template) ---')
+    lines.append(' '.join(infer_cmd))
     lines.append('--- Notes ---')
     lines.append(repro_json['notes'])
     with (out/'reproduce.txt').open('w') as f:
         f.write('\n'.join(lines)+'\n')
     print('[report] Wrote reproduce.json and reproduce.txt')
+
+    # ---------------- Inference Config Export -----------------
+    if args.export_infer_cfg:
+        infer_cfg = {
+            'created_utc': repro_json['timestamp'],
+            'run_dir': str(out.resolve()),
+            'model_ckpt': str((out/'best.ckpt').resolve()) if (out/'best.ckpt').exists() else str((out/'last.ckpt').resolve()),
+            'threshold': (best_dyn['threshold'] if 'best_dyn' in locals() and best_dyn else 0.5),
+            'threshold_source': 'best_threshold.txt' if (out/'best_threshold.txt').exists() else 'default_0.5',
+            'single_logit': repro_json['model']['single_logit'],
+            'preset': repro_json['model']['preset'],
+            'window_size': repro_json['model']['window_size'],
+            'feature_pack': repro_json.get('feature_pack'),
+            'in_chans': meta.get('C') if isinstance(meta, dict) else None,
+            'seed': args.seed,
+            'git_commit': repro_json['git_commit']
+        }
+        with (out/'inference_config.json').open('w') as f:
+            json.dump(infer_cfg, f, indent=2)
+        print('[export] Wrote inference_config.json')
 
 if __name__=='__main__':
     main()

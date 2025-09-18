@@ -1,0 +1,267 @@
+2025-09-17 08:04:24.761387: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-09-17 08:04:24.791893: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-09-17 08:04:25.244785: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-09-17 08:04:25.659668: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.678213: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.678343: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.679341: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.679422: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.679450: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.776473: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.776598: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.776622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1726] Could not identify NUMA node of platform GPU id 0, defaulting to 0.  Your kernel may not have been built with NUMA support.
+2025-09-17 08:04:25.776652: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-17 08:04:25.776674: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1639] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 9517 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 4070 SUPER, pci bus id: 0000:01:00.0, compute capability: 8.9
+GPU detected: 1 physical, 1 logical -> ['/device:GPU:0']
+Config: batch=16, accumulate_steps=8 -> effective_batch=128
+Loaded (1276, 36, 75) (1276,)
+Using mask channel "occlusion_flag" from long_raw (index 7)
+Model: "cnn_bilstm_attn_masked"
+__________________________________________________________________________________________________
+ Layer (type)                Output Shape                 Param #   Connected to                  
+==================================================================================================
+ input (InputLayer)          [(None, 36, 75)]             0         []                            
+                                                                                                  
+ permute_time_features (Per  (None, 75, 36)               0         ['input[0][0]']               
+ mute)                                                                                            
+                                                                                                  
+ conv0 (Conv1D)              (None, 75, 64)               6976      ['permute_time_features[0][0]'
+                                                                    ]                             
+                                                                                                  
+ bn0 (BatchNormalization)    (None, 75, 64)               256       ['conv0[0][0]']               
+                                                                                                  
+ act0 (Activation)           (None, 75, 64)               0         ['bn0[0][0]']                 
+                                                                                                  
+ conv_dropout0 (Dropout)     (None, 75, 64)               0         ['act0[0][0]']                
+                                                                                                  
+ conv1 (Conv1D)              (None, 75, 64)               20544     ['conv_dropout0[0][0]']       
+                                                                                                  
+ bn1 (BatchNormalization)    (None, 75, 64)               256       ['conv1[0][0]']               
+                                                                                                  
+ act1 (Activation)           (None, 75, 64)               0         ['bn1[0][0]']                 
+                                                                                                  
+ conv_dropout1 (Dropout)     (None, 75, 64)               0         ['act1[0][0]']                
+                                                                                                  
+ conv2 (Conv1D)              (None, 75, 64)               12352     ['conv_dropout1[0][0]']       
+                                                                                                  
+ bn2 (BatchNormalization)    (None, 75, 64)               256       ['conv2[0][0]']               
+                                                                                                  
+ act2 (Activation)           (None, 75, 64)               0         ['bn2[0][0]']                 
+                                                                                                  
+ conv_dropout2 (Dropout)     (None, 75, 64)               0         ['act2[0][0]']                
+                                                                                                  
+ bilstm (Bidirectional)      (None, 75, 128)              66048     ['conv_dropout2[0][0]']       
+                                                                                                  
+ mlp_attn_u (Dense)          (None, 75, 32)               4128      ['bilstm[0][0]']              
+                                                                                                  
+ mlp_attn_score (Dense)      (None, 75, 1)                33        ['mlp_attn_u[0][0]']          
+                                                                                                  
+ mlp_attn_squeeze (Lambda)   (None, 75)                   0         ['mlp_attn_score[0][0]']      
+                                                                                                  
+ attn_mask (InputLayer)      [(None, 75)]                 0         []                            
+                                                                                                  
+ mlp_attn_apply_mask (Lambd  (None, 75)                   0         ['mlp_attn_squeeze[0][0]',    
+ a)                                                                  'attn_mask[0][0]']           
+                                                                                                  
+ mlp_attn_softmax (Lambda)   (None, 75)                   0         ['mlp_attn_apply_mask[0][0]'] 
+                                                                                                  
+ mlp_attn_expand (Lambda)    (None, 75, 1)                0         ['mlp_attn_softmax[0][0]']    
+                                                                                                  
+ mlp_attn_weighted (Lambda)  (None, 128)                  0         ['bilstm[0][0]',              
+                                                                     'mlp_attn_expand[0][0]']     
+                                                                                                  
+ fc1 (Dense)                 (None, 64)                   8256      ['mlp_attn_weighted[0][0]']   
+                                                                                                  
+ fc_dropout (Dropout)        (None, 64)                   0         ['fc1[0][0]']                 
+                                                                                                  
+ out (Dense)                 (None, 1)                    65        ['fc_dropout[0][0]']          
+                                                                                                  
+==================================================================================================
+Total params: 119171 (465.51 KB)
+Trainable params: 118786 (464.01 KB)
+Non-trainable params: 385 (1.50 KB)
+__________________________________________________________________________________________________
+None
+Writing results to /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_refine/cw01_fg08/01
+Curriculum: set focal gamma = 0.0000 (epoch 1)
+Epoch 1/70
+2025-09-17 08:04:30.386223: I tensorflow/compiler/xla/stream_executor/cuda/cuda_dnn.cc:432] Loaded cuDNN version 8600
+2025-09-17 08:04:30.462479: I tensorflow/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2025-09-17 08:04:30.607377: I tensorflow/compiler/xla/stream_executor/cuda/cuda_blas.cc:606] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+2025-09-17 08:04:30.924467: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x6007f5563ec0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2025-09-17 08:04:30.924517: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): NVIDIA GeForce RTX 4070 SUPER, Compute Capability 8.9
+2025-09-17 08:04:30.928482: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:255] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+2025-09-17 08:04:30.981251: I tensorflow/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2025-09-17 08:04:31.017270: I ./tensorflow/compiler/jit/device_compiler.h:186] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+56/56 - 7s - loss: 0.3206 - auc: 0.4999 - val_loss: 0.3402 - val_auc: 0.5615 - val_auc_custom: 0.5630 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 7s/epoch - 124ms/step
+Curriculum: set focal gamma = 0.0842 (epoch 2)
+Epoch 2/70
+56/56 - 1s - loss: 0.2610 - auc: 0.5754 - val_loss: 0.2924 - val_auc: 0.5546 - val_auc_custom: 0.5575 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 0.1684 (epoch 3)
+Epoch 3/70
+56/56 - 1s - loss: 0.2357 - auc: 0.5570 - val_loss: 0.2632 - val_auc: 0.5624 - val_auc_custom: 0.5640 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 0.2526 (epoch 4)
+Epoch 4/70
+56/56 - 1s - loss: 0.2188 - auc: 0.6052 - val_loss: 0.2488 - val_auc: 0.5782 - val_auc_custom: 0.5776 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 0.3368 (epoch 5)
+Epoch 5/70
+56/56 - 1s - loss: 0.2041 - auc: 0.6245 - val_loss: 0.2330 - val_auc: 0.5907 - val_auc_custom: 0.5917 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 0.4211 (epoch 6)
+Epoch 6/70
+56/56 - 1s - loss: 0.1909 - auc: 0.6345 - val_loss: 0.2198 - val_auc: 0.5860 - val_auc_custom: 0.5859 - val_f1_custom: 0.1071 - val_recall_custom: 0.0566 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 0.5053 (epoch 7)
+Epoch 7/70
+56/56 - 1s - loss: 0.1784 - auc: 0.6502 - val_loss: 0.2088 - val_auc: 0.5840 - val_auc_custom: 0.5844 - val_f1_custom: 0.1034 - val_recall_custom: 0.0566 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 0.5895 (epoch 8)
+Epoch 8/70
+56/56 - 1s - loss: 0.1664 - auc: 0.6595 - val_loss: 0.1984 - val_auc: 0.5874 - val_auc_custom: 0.5857 - val_f1_custom: 0.1935 - val_recall_custom: 0.1132 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 0.6737 (epoch 9)
+Epoch 9/70
+56/56 - 1s - loss: 0.1574 - auc: 0.6648 - val_loss: 0.1884 - val_auc: 0.5853 - val_auc_custom: 0.5867 - val_f1_custom: 0.2462 - val_recall_custom: 0.1509 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 0.7579 (epoch 10)
+Epoch 10/70
+56/56 - 1s - loss: 0.1457 - auc: 0.6867 - val_loss: 0.1781 - val_auc: 0.5853 - val_auc_custom: 0.5869 - val_f1_custom: 0.2985 - val_recall_custom: 0.1887 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 0.8421 (epoch 11)
+Epoch 11/70
+56/56 - 1s - loss: 0.1391 - auc: 0.6778 - val_loss: 0.1677 - val_auc: 0.5859 - val_auc_custom: 0.5864 - val_f1_custom: 0.3478 - val_recall_custom: 0.2264 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 0.9263 (epoch 12)
+Epoch 12/70
+56/56 - 1s - loss: 0.1309 - auc: 0.6801 - val_loss: 0.1579 - val_auc: 0.5917 - val_auc_custom: 0.5909 - val_f1_custom: 0.3429 - val_recall_custom: 0.2264 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.0105 (epoch 13)
+Epoch 13/70
+56/56 - 1s - loss: 0.1217 - auc: 0.6951 - val_loss: 0.1483 - val_auc: 0.5985 - val_auc_custom: 0.5977 - val_f1_custom: 0.2941 - val_recall_custom: 0.1887 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.0947 (epoch 14)
+Epoch 14/70
+56/56 - 1s - loss: 0.1147 - auc: 0.6991 - val_loss: 0.1410 - val_auc: 0.6014 - val_auc_custom: 0.6015 - val_f1_custom: 0.3421 - val_recall_custom: 0.2453 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.1789 (epoch 15)
+Epoch 15/70
+56/56 - 1s - loss: 0.1068 - auc: 0.7156 - val_loss: 0.1329 - val_auc: 0.6097 - val_auc_custom: 0.6121 - val_f1_custom: 0.3544 - val_recall_custom: 0.2642 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.2632 (epoch 16)
+Epoch 16/70
+56/56 - 1s - loss: 0.0994 - auc: 0.7220 - val_loss: 0.1256 - val_auc: 0.6249 - val_auc_custom: 0.6229 - val_f1_custom: 0.3951 - val_recall_custom: 0.3019 - 1s/epoch - 23ms/step
+Curriculum: set focal gamma = 1.3474 (epoch 17)
+Epoch 17/70
+56/56 - 1s - loss: 0.0940 - auc: 0.7352 - val_loss: 0.1175 - val_auc: 0.6406 - val_auc_custom: 0.6405 - val_f1_custom: 0.3590 - val_recall_custom: 0.2642 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.4316 (epoch 18)
+Epoch 18/70
+56/56 - 1s - loss: 0.0868 - auc: 0.7469 - val_loss: 0.1094 - val_auc: 0.6579 - val_auc_custom: 0.6574 - val_f1_custom: 0.3590 - val_recall_custom: 0.2642 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.5158 (epoch 19)
+Epoch 19/70
+56/56 - 1s - loss: 0.0825 - auc: 0.7521 - val_loss: 0.1041 - val_auc: 0.6642 - val_auc_custom: 0.6659 - val_f1_custom: 0.3750 - val_recall_custom: 0.2830 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 20)
+Epoch 20/70
+56/56 - 1s - loss: 0.0765 - auc: 0.7607 - val_loss: 0.0985 - val_auc: 0.6660 - val_auc_custom: 0.6654 - val_f1_custom: 0.3951 - val_recall_custom: 0.3019 - 1s/epoch - 23ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 21)
+Epoch 21/70
+56/56 - 1s - loss: 0.0767 - auc: 0.7567 - val_loss: 0.0977 - val_auc: 0.6694 - val_auc_custom: 0.6709 - val_f1_custom: 0.4000 - val_recall_custom: 0.3019 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 22)
+Epoch 22/70
+56/56 - 1s - loss: 0.0756 - auc: 0.7730 - val_loss: 0.1063 - val_auc: 0.6615 - val_auc_custom: 0.6599 - val_f1_custom: 0.4946 - val_recall_custom: 0.4340 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 23)
+Epoch 23/70
+56/56 - 1s - loss: 0.0751 - auc: 0.7698 - val_loss: 0.1009 - val_auc: 0.6750 - val_auc_custom: 0.6752 - val_f1_custom: 0.4286 - val_recall_custom: 0.3396 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 24)
+Epoch 24/70
+56/56 - 1s - loss: 0.0743 - auc: 0.7796 - val_loss: 0.1048 - val_auc: 0.6752 - val_auc_custom: 0.6725 - val_f1_custom: 0.5208 - val_recall_custom: 0.4717 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 25)
+Epoch 25/70
+56/56 - 1s - loss: 0.0732 - auc: 0.7896 - val_loss: 0.1039 - val_auc: 0.6745 - val_auc_custom: 0.6737 - val_f1_custom: 0.5361 - val_recall_custom: 0.4906 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 26)
+Epoch 26/70
+56/56 - 1s - loss: 0.0713 - auc: 0.8079 - val_loss: 0.1002 - val_auc: 0.6883 - val_auc_custom: 0.6881 - val_f1_custom: 0.5111 - val_recall_custom: 0.4340 - 1s/epoch - 23ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 27)
+Epoch 27/70
+56/56 - 1s - loss: 0.0703 - auc: 0.8097 - val_loss: 0.1072 - val_auc: 0.6835 - val_auc_custom: 0.6843 - val_f1_custom: 0.5049 - val_recall_custom: 0.4906 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 28)
+Epoch 28/70
+56/56 - 1s - loss: 0.0696 - auc: 0.8103 - val_loss: 0.1093 - val_auc: 0.6751 - val_auc_custom: 0.6755 - val_f1_custom: 0.5098 - val_recall_custom: 0.4906 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 29)
+Epoch 29/70
+56/56 - 1s - loss: 0.0694 - auc: 0.8096 - val_loss: 0.1105 - val_auc: 0.6896 - val_auc_custom: 0.6893 - val_f1_custom: 0.5505 - val_recall_custom: 0.5660 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 30)
+Epoch 30/70
+56/56 - 1s - loss: 0.0667 - auc: 0.8328 - val_loss: 0.1037 - val_auc: 0.6985 - val_auc_custom: 0.6979 - val_f1_custom: 0.5361 - val_recall_custom: 0.4906 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 31)
+Epoch 31/70
+56/56 - 1s - loss: 0.0637 - auc: 0.8536 - val_loss: 0.1144 - val_auc: 0.6801 - val_auc_custom: 0.6800 - val_f1_custom: 0.5505 - val_recall_custom: 0.5660 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 32)
+Epoch 32/70
+56/56 - 1s - loss: 0.0635 - auc: 0.8427 - val_loss: 0.1105 - val_auc: 0.7006 - val_auc_custom: 0.7006 - val_f1_custom: 0.5714 - val_recall_custom: 0.5660 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 33)
+Epoch 33/70
+56/56 - 1s - loss: 0.0641 - auc: 0.8458 - val_loss: 0.1225 - val_auc: 0.6881 - val_auc_custom: 0.6878 - val_f1_custom: 0.5841 - val_recall_custom: 0.6226 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 34)
+Epoch 34/70
+56/56 - 1s - loss: 0.0644 - auc: 0.8395 - val_loss: 0.1139 - val_auc: 0.6986 - val_auc_custom: 0.6971 - val_f1_custom: 0.4950 - val_recall_custom: 0.4717 - 1s/epoch - 19ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 35)
+Epoch 35/70
+56/56 - 1s - loss: 0.0611 - auc: 0.8654 - val_loss: 0.1099 - val_auc: 0.7135 - val_auc_custom: 0.7130 - val_f1_custom: 0.5657 - val_recall_custom: 0.5283 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 36)
+Epoch 36/70
+56/56 - 1s - loss: 0.0629 - auc: 0.8536 - val_loss: 0.1303 - val_auc: 0.6938 - val_auc_custom: 0.6931 - val_f1_custom: 0.5664 - val_recall_custom: 0.6038 - 1s/epoch - 19ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 37)
+Epoch 37/70
+56/56 - 1s - loss: 0.0606 - auc: 0.8666 - val_loss: 0.1166 - val_auc: 0.6935 - val_auc_custom: 0.6933 - val_f1_custom: 0.5000 - val_recall_custom: 0.4528 - 1s/epoch - 19ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 38)
+Epoch 38/70
+56/56 - 1s - loss: 0.0582 - auc: 0.8810 - val_loss: 0.1187 - val_auc: 0.7097 - val_auc_custom: 0.7104 - val_f1_custom: 0.5769 - val_recall_custom: 0.5660 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 39)
+Epoch 39/70
+56/56 - 1s - loss: 0.0607 - auc: 0.8646 - val_loss: 0.1436 - val_auc: 0.6888 - val_auc_custom: 0.6888 - val_f1_custom: 0.5593 - val_recall_custom: 0.6226 - 1s/epoch - 19ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 40)
+Epoch 40/70
+56/56 - 1s - loss: 0.0590 - auc: 0.8721 - val_loss: 0.1104 - val_auc: 0.7150 - val_auc_custom: 0.7157 - val_f1_custom: 0.5455 - val_recall_custom: 0.5094 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 41)
+Epoch 41/70
+56/56 - 1s - loss: 0.0546 - auc: 0.8965 - val_loss: 0.1509 - val_auc: 0.6950 - val_auc_custom: 0.6958 - val_f1_custom: 0.5645 - val_recall_custom: 0.6604 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 42)
+Epoch 42/70
+56/56 - 1s - loss: 0.0564 - auc: 0.8873 - val_loss: 0.1185 - val_auc: 0.7291 - val_auc_custom: 0.7293 - val_f1_custom: 0.5660 - val_recall_custom: 0.5660 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 43)
+Epoch 43/70
+56/56 - 1s - loss: 0.0520 - auc: 0.9131 - val_loss: 0.1271 - val_auc: 0.7341 - val_auc_custom: 0.7351 - val_f1_custom: 0.5766 - val_recall_custom: 0.6038 - 1s/epoch - 22ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 44)
+Epoch 44/70
+56/56 - 1s - loss: 0.0513 - auc: 0.9062 - val_loss: 0.1230 - val_auc: 0.7443 - val_auc_custom: 0.7436 - val_f1_custom: 0.5421 - val_recall_custom: 0.5472 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 45)
+Epoch 45/70
+56/56 - 1s - loss: 0.0550 - auc: 0.8960 - val_loss: 0.1341 - val_auc: 0.7186 - val_auc_custom: 0.7187 - val_f1_custom: 0.5455 - val_recall_custom: 0.5660 - 1s/epoch - 19ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 46)
+Epoch 46/70
+56/56 - 1s - loss: 0.0555 - auc: 0.8913 - val_loss: 0.1103 - val_auc: 0.7420 - val_auc_custom: 0.7424 - val_f1_custom: 0.5474 - val_recall_custom: 0.4906 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 47)
+Epoch 47/70
+56/56 - 1s - loss: 0.0480 - auc: 0.9198 - val_loss: 0.1264 - val_auc: 0.7286 - val_auc_custom: 0.7291 - val_f1_custom: 0.5607 - val_recall_custom: 0.5660 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 48)
+Epoch 48/70
+56/56 - 1s - loss: 0.0479 - auc: 0.9204 - val_loss: 0.1434 - val_auc: 0.7170 - val_auc_custom: 0.7172 - val_f1_custom: 0.5405 - val_recall_custom: 0.5660 - 1s/epoch - 19ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 49)
+Epoch 49/70
+56/56 - 1s - loss: 0.0506 - auc: 0.9149 - val_loss: 0.1440 - val_auc: 0.7206 - val_auc_custom: 0.7203 - val_f1_custom: 0.5913 - val_recall_custom: 0.6415 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 50)
+Epoch 50/70
+56/56 - 1s - loss: 0.0504 - auc: 0.9133 - val_loss: 0.1401 - val_auc: 0.7425 - val_auc_custom: 0.7426 - val_f1_custom: 0.6182 - val_recall_custom: 0.6415 - 1s/epoch - 21ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 51)
+Epoch 51/70
+56/56 - 1s - loss: 0.0482 - auc: 0.9230 - val_loss: 0.1608 - val_auc: 0.7036 - val_auc_custom: 0.7034 - val_f1_custom: 0.5690 - val_recall_custom: 0.6226 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 52)
+Epoch 52/70
+56/56 - 1s - loss: 0.0510 - auc: 0.9106 - val_loss: 0.1162 - val_auc: 0.7313 - val_auc_custom: 0.7323 - val_f1_custom: 0.5417 - val_recall_custom: 0.4906 - 1s/epoch - 19ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 53)
+Epoch 53/70
+56/56 - 1s - loss: 0.0465 - auc: 0.9246 - val_loss: 0.1222 - val_auc: 0.7414 - val_auc_custom: 0.7416 - val_f1_custom: 0.5631 - val_recall_custom: 0.5472 - 1s/epoch - 20ms/step
+Curriculum: set focal gamma = 1.6000 (epoch 54)
+Epoch 54/70
+56/56 - 1s - loss: 0.0476 - auc: 0.9242 - val_loss: 0.1483 - val_auc: 0.7396 - val_auc_custom: 0.7436 - val_f1_custom: 0.5421 - val_recall_custom: 0.5472 - 1s/epoch - 20ms/step
+Mask config -> mode=soft, threshold=0.6, window_gate=None
+Done. Results saved to /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_refine/cw01_fg08/01

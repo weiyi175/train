@@ -1,0 +1,74 @@
+{
+  "test": {
+    "auc": 0.6247240618101546,
+    "f1": 0.0,
+    "recall": 0.0,
+    "TP": 0,
+    "FP": 0,
+    "FN": 105,
+    "TN": 151
+  },
+  "top_epochs": [
+    {
+      "epoch": 1,
+      "auc": 0.6236477987421384,
+      "f1": 0.0,
+      "recall": 0.0,
+      "score": 0.12472955974842768,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    },
+    {
+      "epoch": 11,
+      "auc": 0.6236477987421384,
+      "f1": 0.0,
+      "recall": 0.0,
+      "score": 0.12472955974842768,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    },
+    {
+      "epoch": 7,
+      "auc": 0.6171069182389937,
+      "f1": 0.0,
+      "recall": 0.0,
+      "score": 0.12342138364779874,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    },
+    {
+      "epoch": 6,
+      "auc": 0.6148427672955975,
+      "f1": 0.0,
+      "recall": 0.0,
+      "score": 0.1229685534591195,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 16,
+    "accumulate_steps": 8,
+    "effective_batch": 128,
+    "run_seed": null,
+    "focal_alpha": 0.22,
+    "focal_gamma_start": 0.0,
+    "focal_gamma_end": 1.6,
+    "curriculum_epochs": 20,
+    "class_weight_neg": 1.0,
+    "class_weight_pos": 0.75,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": null
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce/windows_npz.npz --epochs 70 --batch 16 --accumulate_steps 8 --result_dir /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_refine/cw01_fg02 --focal_alpha 0.22 --focal_gamma_start 0.0 --focal_gamma_end 1.6 --curriculum_epochs 20 --run_seed None --class_weight_neg 1.0 --class_weight_pos 0.75 --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean None  [auto-mask: occlusion_flag]"
+}

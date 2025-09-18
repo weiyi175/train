@@ -1,0 +1,61 @@
+{
+  "test": {
+    "auc": 0.7463260801009145,
+    "f1": 0.5325443786982249,
+    "recall": 0.42857142857142855,
+    "TP": 45,
+    "FP": 19,
+    "FN": 60,
+    "TN": 132
+  },
+  "top_epochs": [
+    {
+      "epoch": 93,
+      "auc": 0.7237735849056603,
+      "f1": 0.6422018348623854,
+      "recall": 0.660377358490566,
+      "score": 0.6676039466851307,
+      "TP": 35,
+      "FP": 21,
+      "FN": 18,
+      "TN": 54
+    },
+    {
+      "epoch": 92,
+      "auc": 0.7290566037735848,
+      "f1": 0.6346153846153846,
+      "recall": 0.6226415094339622,
+      "score": 0.6475166908563135,
+      "TP": 33,
+      "FP": 18,
+      "FN": 20,
+      "TN": 57
+    },
+    {
+      "epoch": 38,
+      "auc": 0.6754716981132076,
+      "f1": 0.5833333333333334,
+      "recall": 0.660377358490566,
+      "score": 0.6402830188679245,
+      "TP": 35,
+      "FP": 32,
+      "FN": 18,
+      "TN": 43
+    },
+    {
+      "epoch": 86,
+      "auc": 0.7418867924528302,
+      "f1": 0.5945945945945946,
+      "recall": 0.6226415094339622,
+      "score": 0.6380764915859256,
+      "TP": 33,
+      "FP": 25,
+      "FN": 20,
+      "TN": 50
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn"
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce/windows_npz.npz --epochs 100 --batch 64 --result_dir /home/user/projects/train/model/long_window/CNN_BiLSTM/result --focal_alpha 0.25 --focal_gamma_start 0.0 --focal_gamma_end 1.5 --curriculum_epochs 20 --no_early_stop --run_seed 30"
+}

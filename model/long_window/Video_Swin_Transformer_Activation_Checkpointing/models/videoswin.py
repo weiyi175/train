@@ -181,7 +181,8 @@ class VideoSwin3DFeature(nn.Module):
         for si,stage in enumerate(self.stages):
             for blk in stage['blocks']:
                 if self.use_checkpoint and si>=self.ckpt_stage_start and self.training:
-                    x=checkpoint(blk,x)
+                    # Explicitly set use_reentrant=False (PyTorch >=2.3 warning otherwise)
+                    x=checkpoint(blk, x, use_reentrant=False)
                 else:
                     x=blk(x)
             if isinstance(stage['down'], PatchMerging3D):

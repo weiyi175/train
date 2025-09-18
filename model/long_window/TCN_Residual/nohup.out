@@ -1,0 +1,204 @@
+2025-09-15 15:30:09.758490: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-09-15 15:30:09.788091: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+2025-09-15 15:30:09.994543: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+2025-09-15 15:30:09.995590: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-09-15 15:30:10.738225: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-09-15 15:30:12.453648: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-15 15:30:12.453965: W tensorflow/core/common_runtime/gpu/gpu_device.cc:1960] Cannot dlopen some GPU libraries. Please make sure the missing libraries mentioned above are installed properly if you would like to use GPU. Follow the guide at https://www.tensorflow.org/install/gpu for how to download and setup the required libraries for your platform.
+Skipping registering GPU devices...
+Loaded (1276, 36, 75) (1276,)
+Model: "model"
+__________________________________________________________________________________________________
+ Layer (type)                Output Shape                 Param #   Connected to                  
+==================================================================================================
+ input (InputLayer)          [(None, 36, 75)]             0         []                            
+                                                                                                  
+ conv1d (Conv1D)             (None, 36, 64)               4864      ['input[0][0]']               
+                                                                                                  
+ conv1d_1 (Conv1D)           (None, 36, 64)               12352     ['conv1d[0][0]']              
+                                                                                                  
+ activation (Activation)     (None, 36, 64)               0         ['conv1d_1[0][0]']            
+                                                                                                  
+ dropout (Dropout)           (None, 36, 64)               0         ['activation[0][0]']          
+                                                                                                  
+ conv1d_2 (Conv1D)           (None, 36, 64)               12352     ['dropout[0][0]']             
+                                                                                                  
+ activation_1 (Activation)   (None, 36, 64)               0         ['conv1d_2[0][0]']            
+                                                                                                  
+ dropout_1 (Dropout)         (None, 36, 64)               0         ['activation_1[0][0]']        
+                                                                                                  
+ lambda (Lambda)             (None, 36, 64)               0         ['dropout_1[0][0]']           
+                                                                                                  
+ add (Add)                   (None, 36, 64)               0         ['conv1d[0][0]',              
+                                                                     'lambda[0][0]']              
+                                                                                                  
+ layer_normalization (Layer  (None, 36, 64)               128       ['add[0][0]']                 
+ Normalization)                                                                                   
+                                                                                                  
+ conv1d_3 (Conv1D)           (None, 36, 64)               12352     ['layer_normalization[0][0]'] 
+                                                                                                  
+ activation_2 (Activation)   (None, 36, 64)               0         ['conv1d_3[0][0]']            
+                                                                                                  
+ dropout_2 (Dropout)         (None, 36, 64)               0         ['activation_2[0][0]']        
+                                                                                                  
+ conv1d_4 (Conv1D)           (None, 36, 64)               12352     ['dropout_2[0][0]']           
+                                                                                                  
+ activation_3 (Activation)   (None, 36, 64)               0         ['conv1d_4[0][0]']            
+                                                                                                  
+ dropout_3 (Dropout)         (None, 36, 64)               0         ['activation_3[0][0]']        
+                                                                                                  
+ lambda_1 (Lambda)           (None, 36, 64)               0         ['dropout_3[0][0]']           
+                                                                                                  
+ add_1 (Add)                 (None, 36, 64)               0         ['layer_normalization[0][0]', 
+                                                                     'lambda_1[0][0]']            
+                                                                                                  
+ layer_normalization_1 (Lay  (None, 36, 64)               128       ['add_1[0][0]']               
+ erNormalization)                                                                                 
+                                                                                                  
+ conv1d_5 (Conv1D)           (None, 36, 64)               12352     ['layer_normalization_1[0][0]'
+                                                                    ]                             
+                                                                                                  
+ activation_4 (Activation)   (None, 36, 64)               0         ['conv1d_5[0][0]']            
+                                                                                                  
+ dropout_4 (Dropout)         (None, 36, 64)               0         ['activation_4[0][0]']        
+                                                                                                  
+ conv1d_6 (Conv1D)           (None, 36, 64)               12352     ['dropout_4[0][0]']           
+                                                                                                  
+ activation_5 (Activation)   (None, 36, 64)               0         ['conv1d_6[0][0]']            
+                                                                                                  
+ dropout_5 (Dropout)         (None, 36, 64)               0         ['activation_5[0][0]']        
+                                                                                                  
+ lambda_2 (Lambda)           (None, 36, 64)               0         ['dropout_5[0][0]']           
+                                                                                                  
+ add_2 (Add)                 (None, 36, 64)               0         ['layer_normalization_1[0][0]'
+                                                                    , 'lambda_2[0][0]']           
+                                                                                                  
+ layer_normalization_2 (Lay  (None, 36, 64)               128       ['add_2[0][0]']               
+ erNormalization)                                                                                 
+                                                                                                  
+ conv1d_7 (Conv1D)           (None, 36, 64)               12352     ['layer_normalization_2[0][0]'
+                                                                    ]                             
+                                                                                                  
+ activation_6 (Activation)   (None, 36, 64)               0         ['conv1d_7[0][0]']            
+                                                                                                  
+ dropout_6 (Dropout)         (None, 36, 64)               0         ['activation_6[0][0]']        
+                                                                                                  
+ conv1d_8 (Conv1D)           (None, 36, 64)               12352     ['dropout_6[0][0]']           
+                                                                                                  
+ activation_7 (Activation)   (None, 36, 64)               0         ['conv1d_8[0][0]']            
+                                                                                                  
+ dropout_7 (Dropout)         (None, 36, 64)               0         ['activation_7[0][0]']        
+                                                                                                  
+ lambda_3 (Lambda)           (None, 36, 64)               0         ['dropout_7[0][0]']           
+                                                                                                  
+ add_3 (Add)                 (None, 36, 64)               0         ['layer_normalization_2[0][0]'
+                                                                    , 'lambda_3[0][0]']           
+                                                                                                  
+ layer_normalization_3 (Lay  (None, 36, 64)               128       ['add_3[0][0]']               
+ erNormalization)                                                                                 
+                                                                                                  
+ gated_attn_g_channel (_Cha  (None, 36, 64)               64        ['layer_normalization_3[0][0]'
+ nnelVectorGateLayer)                                               ]                             
+                                                                                                  
+ gated_attn_gated_part (Lam  (None, 36, 64)               0         ['layer_normalization_3[0][0]'
+ bda)                                                               , 'gated_attn_g_channel[0][0]'
+                                                                    ]                             
+                                                                                                  
+ gated_attn_residual_out (L  (None, 36, 64)               0         ['layer_normalization_3[0][0]'
+ ambda)                                                             , 'gated_attn_gated_part[0][0]
+                                                                    ']                            
+                                                                                                  
+ gated_attn_h_from_residual  (None, 36, 32)               2080      ['gated_attn_residual_out[0][0
+  (Dense)                                                           ]']                           
+                                                                                                  
+ gated_attn_score (Dense)    (None, 36, 1)                33        ['gated_attn_h_from_residual[0
+                                                                    ][0]']                        
+                                                                                                  
+ gated_attn_squeeze (Lambda  (None, 36)                   0         ['gated_attn_score[0][0]']    
+ )                                                                                                
+                                                                                                  
+ gated_attn_softmax (Lambda  (None, 36)                   0         ['gated_attn_squeeze[0][0]']  
+ )                                                                                                
+                                                                                                  
+ gated_attn_expand (Lambda)  (None, 36, 1)                0         ['gated_attn_softmax[0][0]']  
+                                                                                                  
+ gated_attn_weighted (Lambd  (None, 64)                   0         ['layer_normalization_3[0][0]'
+ a)                                                                 , 'gated_attn_expand[0][0]']  
+                                                                                                  
+ out (Dense)                 (None, 1)                    65        ['gated_attn_weighted[0][0]'] 
+                                                                                                  
+==================================================================================================
+Total params: 106434 (415.76 KB)
+Trainable params: 106434 (415.76 KB)
+Non-trainable params: 0 (0.00 Byte)
+__________________________________________________________________________________________________
+Writing results to /home/user/projects/train/model/long_window/TCN_Residual/result/24
+Curriculum: set focal gamma = 0.0000 (epoch 1)
+Epoch 1/100
+14/14 - 3s - loss: 0.4215 - auc: 0.5226 - val_loss: 0.3441 - val_auc: 0.5547 - val_auc_custom: 0.5557 - val_f1_custom: 0.2597 - val_recall_custom: 0.1887 - 3s/epoch - 199ms/step
+Curriculum: set focal gamma = 0.0789 (epoch 2)
+Epoch 2/100
+14/14 - 0s - loss: 0.2917 - auc: 0.5292 - val_loss: 0.2797 - val_auc: 0.5526 - val_auc_custom: 0.5545 - val_f1_custom: 0.0364 - val_recall_custom: 0.0189 - 433ms/epoch - 31ms/step
+Curriculum: set focal gamma = 0.1579 (epoch 3)
+Epoch 3/100
+14/14 - 0s - loss: 0.2506 - auc: 0.5475 - val_loss: 0.2586 - val_auc: 0.5605 - val_auc_custom: 0.5610 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 455ms/epoch - 32ms/step
+Curriculum: set focal gamma = 0.2368 (epoch 4)
+Epoch 4/100
+14/14 - 0s - loss: 0.2283 - auc: 0.5808 - val_loss: 0.2375 - val_auc: 0.5669 - val_auc_custom: 0.5655 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 453ms/epoch - 32ms/step
+Curriculum: set focal gamma = 0.3158 (epoch 5)
+Epoch 5/100
+14/14 - 0s - loss: 0.2088 - auc: 0.6128 - val_loss: 0.2207 - val_auc: 0.5687 - val_auc_custom: 0.5691 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 453ms/epoch - 32ms/step
+Curriculum: set focal gamma = 0.3947 (epoch 6)
+Epoch 6/100
+14/14 - 0s - loss: 0.1932 - auc: 0.6407 - val_loss: 0.2075 - val_auc: 0.5722 - val_auc_custom: 0.5708 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 463ms/epoch - 33ms/step
+Curriculum: set focal gamma = 0.4737 (epoch 7)
+Epoch 7/100
+14/14 - 0s - loss: 0.1798 - auc: 0.6612 - val_loss: 0.1944 - val_auc: 0.5844 - val_auc_custom: 0.5859 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 462ms/epoch - 33ms/step
+Curriculum: set focal gamma = 0.5526 (epoch 8)
+Epoch 8/100
+14/14 - 0s - loss: 0.1672 - auc: 0.6890 - val_loss: 0.1819 - val_auc: 0.6003 - val_auc_custom: 0.6010 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - 445ms/epoch - 32ms/step
+Curriculum: set focal gamma = 0.6316 (epoch 9)
+Epoch 9/100
+14/14 - 0s - loss: 0.1554 - auc: 0.7057 - val_loss: 0.1719 - val_auc: 0.6122 - val_auc_custom: 0.6128 - val_f1_custom: 0.0370 - val_recall_custom: 0.0189 - 437ms/epoch - 31ms/step
+Curriculum: set focal gamma = 0.7105 (epoch 10)
+Epoch 10/100
+14/14 - 0s - loss: 0.1444 - auc: 0.7284 - val_loss: 0.1622 - val_auc: 0.6219 - val_auc_custom: 0.6221 - val_f1_custom: 0.0370 - val_recall_custom: 0.0189 - 430ms/epoch - 31ms/step
+Curriculum: set focal gamma = 0.7895 (epoch 11)
+Epoch 11/100
+14/14 - 0s - loss: 0.1344 - auc: 0.7402 - val_loss: 0.1542 - val_auc: 0.6292 - val_auc_custom: 0.6287 - val_f1_custom: 0.1053 - val_recall_custom: 0.0566 - 436ms/epoch - 31ms/step
+Curriculum: set focal gamma = 0.8684 (epoch 12)
+Epoch 12/100
+14/14 - 0s - loss: 0.1248 - auc: 0.7585 - val_loss: 0.1481 - val_auc: 0.6403 - val_auc_custom: 0.6392 - val_f1_custom: 0.1333 - val_recall_custom: 0.0755 - 437ms/epoch - 31ms/step
+Curriculum: set focal gamma = 0.9474 (epoch 13)
+Epoch 13/100
+14/14 - 0s - loss: 0.1146 - auc: 0.7779 - val_loss: 0.1417 - val_auc: 0.6351 - val_auc_custom: 0.6350 - val_f1_custom: 0.1333 - val_recall_custom: 0.0755 - 408ms/epoch - 29ms/step
+Curriculum: set focal gamma = 1.0263 (epoch 14)
+Epoch 14/100
+14/14 - 0s - loss: 0.1088 - auc: 0.7785 - val_loss: 0.1380 - val_auc: 0.6228 - val_auc_custom: 0.6224 - val_f1_custom: 0.1905 - val_recall_custom: 0.1132 - 414ms/epoch - 30ms/step
+Curriculum: set focal gamma = 1.1053 (epoch 15)
+Epoch 15/100
+14/14 - 0s - loss: 0.0978 - auc: 0.8110 - val_loss: 0.1322 - val_auc: 0.6317 - val_auc_custom: 0.6289 - val_f1_custom: 0.1905 - val_recall_custom: 0.1132 - 426ms/epoch - 30ms/step
+Curriculum: set focal gamma = 1.1842 (epoch 16)
+Epoch 16/100
+14/14 - 0s - loss: 0.0942 - auc: 0.7999 - val_loss: 0.1266 - val_auc: 0.6244 - val_auc_custom: 0.6236 - val_f1_custom: 0.2687 - val_recall_custom: 0.1698 - 432ms/epoch - 31ms/step
+Curriculum: set focal gamma = 1.2632 (epoch 17)
+Epoch 17/100
+14/14 - 0s - loss: 0.0865 - auc: 0.8209 - val_loss: 0.1198 - val_auc: 0.6298 - val_auc_custom: 0.6292 - val_f1_custom: 0.2462 - val_recall_custom: 0.1509 - 418ms/epoch - 30ms/step
+Curriculum: set focal gamma = 1.3421 (epoch 18)
+Epoch 18/100
+14/14 - 0s - loss: 0.0799 - auc: 0.8335 - val_loss: 0.1171 - val_auc: 0.6278 - val_auc_custom: 0.6272 - val_f1_custom: 0.3429 - val_recall_custom: 0.2264 - 407ms/epoch - 29ms/step
+Curriculum: set focal gamma = 1.4211 (epoch 19)
+Epoch 19/100
+14/14 - 0s - loss: 0.0736 - auc: 0.8401 - val_loss: 0.1127 - val_auc: 0.6230 - val_auc_custom: 0.6244 - val_f1_custom: 0.2727 - val_recall_custom: 0.1698 - 419ms/epoch - 30ms/step
+Curriculum: set focal gamma = 1.5000 (epoch 20)
+Epoch 20/100
+14/14 - 0s - loss: 0.0696 - auc: 0.8430 - val_loss: 0.1108 - val_auc: 0.6171 - val_auc_custom: 0.6171 - val_f1_custom: 0.3333 - val_recall_custom: 0.2264 - 420ms/epoch - 30ms/step
+Curriculum: set focal gamma = 1.5000 (epoch 21)
+Epoch 21/100
+14/14 - 0s - loss: 0.0676 - auc: 0.8534 - val_loss: 0.1099 - val_auc: 0.6229 - val_auc_custom: 0.6231 - val_f1_custom: 0.3333 - val_recall_custom: 0.2264 - 435ms/epoch - 31ms/step
+Curriculum: set focal gamma = 1.5000 (epoch 22)
+Epoch 22/100
+14/14 - 0s - loss: 0.0645 - auc: 0.8733 - val_loss: 0.1128 - val_auc: 0.6244 - val_auc_custom: 0.6392 - val_f1_custom: 0.1333 - val_recall_custom: 0.0755 - 440ms/epoch - 31ms/step
+Done. Results saved to /home/user/projects/train/model/long_window/TCN_Residual/result/24

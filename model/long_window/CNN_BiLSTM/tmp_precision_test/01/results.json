@@ -1,0 +1,62 @@
+{
+  "test": {
+    "auc": 0.6338063702302112,
+    "f1": 0.0,
+    "recall": 0.0,
+    "precision": 0.0,
+    "composite": 0.12676127404604226,
+    "precision_aware": 0.12676127404604226,
+    "TP": 0,
+    "FP": 0,
+    "FN": 105,
+    "TN": 151
+  },
+  "top_epochs": [
+    {
+      "epoch": 1,
+      "auc": 0.5984905660377359,
+      "f1": 0.0,
+      "recall": 0.0,
+      "precision": 0.0,
+      "score": 0.11969811320754718,
+      "precision_aware": 0.11969811320754718,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    }
+  ],
+  "top_epochs_precision_aware": [
+    {
+      "epoch": 1,
+      "auc": 0.5984905660377359,
+      "f1": 0.0,
+      "recall": 0.0,
+      "precision": 0.0,
+      "score": 0.11969811320754718,
+      "precision_aware": 0.11969811320754718,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 8,
+    "accumulate_steps": 8,
+    "effective_batch": 64,
+    "run_seed": null,
+    "focal_alpha": 0.4,
+    "focal_gamma_start": 0.0,
+    "focal_gamma_end": 1.0,
+    "curriculum_epochs": 20,
+    "class_weight_neg": 1.05,
+    "class_weight_pos": 0.8,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": null,
+    "checkpoint_metric": "composite"
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce/windows_npz.npz --epochs 1 --batch 8 --accumulate_steps 8 --result_dir model/long_window/CNN_BiLSTM/tmp_precision_test --focal_alpha 0.4 --focal_gamma_start 0.0 --focal_gamma_end 1.0 --curriculum_epochs 20 --no_early_stop --run_seed None --checkpoint_metric composite --class_weight_neg 1.05 --class_weight_pos 0.8 --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean None  [auto-mask: occlusion_flag]"
+}

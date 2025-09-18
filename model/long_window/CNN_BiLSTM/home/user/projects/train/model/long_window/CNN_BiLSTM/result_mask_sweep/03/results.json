@@ -1,0 +1,68 @@
+{
+  "test": {
+    "auc": 0.5047619047619047,
+    "f1": 0.018867924528301886,
+    "recall": 0.009523809523809525,
+    "TP": 1,
+    "FP": 0,
+    "FN": 104,
+    "TN": 151
+  },
+  "top_epochs": [
+    {
+      "epoch": 1,
+      "auc": 0.5,
+      "f1": 0.0,
+      "recall": 0.0,
+      "score": 0.1,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    },
+    {
+      "epoch": 2,
+      "auc": 0.5,
+      "f1": 0.0,
+      "recall": 0.0,
+      "score": 0.1,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    },
+    {
+      "epoch": 3,
+      "auc": 0.5,
+      "f1": 0.0,
+      "recall": 0.0,
+      "score": 0.1,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    },
+    {
+      "epoch": 4,
+      "auc": 0.5,
+      "f1": 0.0,
+      "recall": 0.0,
+      "score": 0.1,
+      "TP": 0,
+      "FP": 0,
+      "FN": 53,
+      "TN": 75
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 16,
+    "accumulate_steps": 8,
+    "effective_batch": 128,
+    "run_seed": null,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": 0.65
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce/windows_npz.npz --epochs 50 --batch 16 --accumulate_steps 8 --result_dir /home/user/projects/train/model/long_window/CNN_BiLSTM//home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep --focal_alpha 0.25 --focal_gamma_start 0.0 --focal_gamma_end 1.5 --curriculum_epochs 20 --run_seed None --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean 0.65  [auto-mask: occlusion_flag]"
+}

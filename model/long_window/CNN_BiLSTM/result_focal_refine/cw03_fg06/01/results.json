@@ -1,0 +1,74 @@
+{
+  "test": {
+    "auc": 0.7438662882371492,
+    "f1": 0.5980392156862745,
+    "recall": 0.580952380952381,
+    "TP": 61,
+    "FP": 38,
+    "FN": 44,
+    "TN": 113
+  },
+  "top_epochs": [
+    {
+      "epoch": 59,
+      "auc": 0.8118238993710691,
+      "f1": 0.6846846846846847,
+      "recall": 0.7169811320754716,
+      "score": 0.726260751317355,
+      "TP": 38,
+      "FP": 20,
+      "FN": 15,
+      "TN": 55
+    },
+    {
+      "epoch": 53,
+      "auc": 0.8155974842767295,
+      "f1": 0.7047619047619048,
+      "recall": 0.6981132075471698,
+      "score": 0.7236046720575022,
+      "TP": 37,
+      "FP": 15,
+      "FN": 16,
+      "TN": 60
+    },
+    {
+      "epoch": 49,
+      "auc": 0.8083018867924529,
+      "f1": 0.6915887850467289,
+      "recall": 0.6981132075471698,
+      "score": 0.7181936166460942,
+      "TP": 37,
+      "FP": 17,
+      "FN": 16,
+      "TN": 58
+    },
+    {
+      "epoch": 55,
+      "auc": 0.8183647798742137,
+      "f1": 0.693069306930693,
+      "recall": 0.660377358490566,
+      "score": 0.7017824272993337,
+      "TP": 35,
+      "FP": 13,
+      "FN": 18,
+      "TN": 62
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 16,
+    "accumulate_steps": 8,
+    "effective_batch": 128,
+    "run_seed": null,
+    "focal_alpha": 0.28,
+    "focal_gamma_start": 0.0,
+    "focal_gamma_end": 1.6,
+    "curriculum_epochs": 20,
+    "class_weight_neg": 1.0,
+    "class_weight_pos": 0.85,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": null
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce/windows_npz.npz --epochs 70 --batch 16 --accumulate_steps 8 --result_dir /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_refine/cw03_fg06 --focal_alpha 0.28 --focal_gamma_start 0.0 --focal_gamma_end 1.6 --curriculum_epochs 20 --run_seed None --class_weight_neg 1.0 --class_weight_pos 0.85 --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean None  [auto-mask: occlusion_flag]"
+}

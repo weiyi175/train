@@ -1,0 +1,74 @@
+{
+  "test": {
+    "auc": 0.7102491327656891,
+    "f1": 0.55,
+    "recall": 0.5238095238095238,
+    "TP": 55,
+    "FP": 40,
+    "FN": 50,
+    "TN": 111
+  },
+  "top_epochs": [
+    {
+      "epoch": 51,
+      "auc": 0.7469182389937107,
+      "f1": 0.6371681415929203,
+      "recall": 0.6792452830188679,
+      "score": 0.6801567317860522,
+      "TP": 36,
+      "FP": 24,
+      "FN": 17,
+      "TN": 51
+    },
+    {
+      "epoch": 56,
+      "auc": 0.7192452830188679,
+      "f1": 0.6017699115044248,
+      "recall": 0.6415094339622641,
+      "score": 0.6451347470362331,
+      "TP": 34,
+      "FP": 26,
+      "FN": 19,
+      "TN": 49
+    },
+    {
+      "epoch": 45,
+      "auc": 0.7159748427672956,
+      "f1": 0.6,
+      "recall": 0.6226415094339622,
+      "score": 0.6345157232704403,
+      "TP": 33,
+      "FP": 24,
+      "FN": 20,
+      "TN": 51
+    },
+    {
+      "epoch": 40,
+      "auc": 0.72,
+      "f1": 0.5961538461538461,
+      "recall": 0.5849056603773585,
+      "score": 0.6152989840348331,
+      "TP": 31,
+      "FP": 20,
+      "FN": 22,
+      "TN": 55
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 16,
+    "accumulate_steps": 8,
+    "effective_batch": 128,
+    "run_seed": null,
+    "focal_alpha": 0.25,
+    "focal_gamma_start": 0.0,
+    "focal_gamma_end": 1.6,
+    "curriculum_epochs": 20,
+    "class_weight_neg": 1.0,
+    "class_weight_pos": 1.0,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": null
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce/windows_npz.npz --epochs 70 --batch 16 --accumulate_steps 8 --result_dir /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_refine/cw08_fg04 --focal_alpha 0.25 --focal_gamma_start 0.0 --focal_gamma_end 1.6 --curriculum_epochs 20 --run_seed None --class_weight_neg 1.0 --class_weight_pos 1.0 --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean None  [auto-mask: occlusion_flag]"
+}

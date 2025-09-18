@@ -1,0 +1,30 @@
+{
+  "created_utc": "2025-09-13T01:57:15.328763Z",
+  "run_dir": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/12",
+  "model_ckpt": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/12/best.ckpt",
+  "threshold": 0.3214981003322793,
+  "threshold_source": "best_threshold.txt",
+  "single_logit": true,
+  "preset": "tiny",
+  "window_size": [
+    2,
+    7,
+    7
+  ],
+  "feature_pack": {
+    "enabled": true,
+    "components": {
+      "velocity": true,
+      "accel": true,
+      "energy": true,
+      "pairwise": false
+    },
+    "components_flag": "velocity,accel,energy",
+    "joints": 15,
+    "dims_per_joint": 4,
+    "pairwise_subset": 20
+  },
+  "in_chans": 4,
+  "seed": 13,
+  "git_commit": "44c2404115e815b62b7ee648d585ce8752c5c85b"
+}

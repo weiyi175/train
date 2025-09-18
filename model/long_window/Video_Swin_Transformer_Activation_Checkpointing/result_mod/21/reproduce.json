@@ -1,0 +1,132 @@
+{
+  "timestamp": "2025-09-13T06:28:08.777164Z",
+  "command": "model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/train_videoswin.py --preset tiny --feature_pack --fp_components velocity,accel,energy --batch 8 --accum 8 --epochs 25 --lr 3e-4 --early_patience 10 --layer_decay 0.8 --weight_decay 0.02 --dynamic_threshold --amp --use_checkpoint",
+  "git_commit": "44c2404115e815b62b7ee648d585ce8752c5c85b",
+  "python": "3.10.12",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "torch": "2.3.1+cu121",
+  "cuda_available": true,
+  "device_name": "NVIDIA GeForce RTX 4070 SUPER",
+  "seed": 42,
+  "data_npz": "/home/user/projects/train/train_data/Slipce_2/windows_v2_all.npz",
+  "data_meta": {
+    "train_class_counts": [
+      586,
+      435
+    ]
+  },
+  "feature_pack": {
+    "enabled": true,
+    "components": {
+      "velocity": true,
+      "accel": true,
+      "energy": true,
+      "pairwise": false
+    },
+    "components_flag": "velocity,accel,energy",
+    "joints": 15,
+    "dims_per_joint": 4,
+    "pairwise_subset": 20
+  },
+  "model": {
+    "preset": "tiny",
+    "window_size": [
+      2,
+      7,
+      7
+    ],
+    "depths": null,
+    "num_heads": null,
+    "embed_dim": null,
+    "drop_path_rate": null,
+    "use_checkpoint": true,
+    "param_count": 29128015,
+    "single_logit": true
+  },
+  "optimization": {
+    "epochs": 25,
+    "batch_micro": 8,
+    "accum": 8,
+    "effective_batch": 64,
+    "lr": 0.0003,
+    "weight_decay": 0.02,
+    "warmup_epochs": 2,
+    "early_patience": 10,
+    "min_delta": 0.0001,
+    "no_early_stop": false,
+    "pos_weight": null,
+    "sampler_used": false,
+    "balance_by_class": false,
+    "amplify_hard_negative": false,
+    "hard_negative_factor": 2.0,
+    "temporal_jitter": 0,
+    "focal_loss": false,
+    "focal_gamma": 2.0,
+    "ema_f1_alpha": 0.2,
+    "layer_decay": 0.8,
+    "freeze_epochs": 0,
+    "dynamic_threshold": true,
+    "auto_batch_probe": false,
+    "max_probe_batch": null,
+    "batch_source": "manual",
+    "capacity_throughput": null,
+    "capacity_peak_mem": null,
+    "feature_pack_mode_detected": "light"
+  },
+  "metrics": {
+    "best_epoch": 1,
+    "best_f1": 0.5134099616858238,
+    "best_record": {
+      "epoch": 1,
+      "loss": 0.8074233096558601,
+      "lr": 0.00014882812499999998,
+      "f1": 0.5134099616858238,
+      "auc": 0.611276566941925,
+      "cm": [
+        [
+          61,
+          105
+        ],
+        [
+          22,
+          67
+        ]
+      ],
+      "acc": 0.501960813999176,
+      "f1_opt": 0.5243902439024389,
+      "best_threshold": 0.3791412675200994,
+      "f1_ema": 0.5134099616858238
+    },
+    "last_record": {
+      "epoch": 11,
+      "loss": 0.11731713912513442,
+      "lr": 0.0002007147961416163,
+      "f1": 0.38235294117647056,
+      "auc": 0.508528496006498,
+      "cm": [
+        [
+          90,
+          76
+        ],
+        [
+          50,
+          39
+        ]
+      ],
+      "acc": 0.5058823823928833,
+      "f1_opt": 0.5246913580246914,
+      "best_threshold": 0.0009583193889524245,
+      "f1_ema": 0.40779553230597015
+    },
+    "best_dynamic_threshold": 0.17733784544108502,
+    "best_f1_opt": 0.5415162454873647
+  },
+  "artifacts": {
+    "history_json": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/21/history.json",
+    "best_ckpt": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/21/best.ckpt",
+    "last_ckpt": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/21/last.ckpt",
+    "threshold_history": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/21/threshold_history.json",
+    "best_threshold_txt": "/home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/21/best_threshold.txt"
+  },
+  "notes": "Weights (.ckpt/.pt/.onnx) may be excluded from backup; this report plus seed & code commit allow retraining. Minor nondeterminism can arise from CUDA kernels unless fully deterministic settings are enforced."
+}

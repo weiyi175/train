@@ -1,0 +1,7 @@
+run_dir,threshold,window_gate,effective_batch,seed,test_auc,test_f1,test_recall,test_precision,test_composite,test_precision_aware,test_TP,test_FP,test_FN,test_TN,val_best_epoch_composite,val_best_composite,val_best_epoch_precision_aware,val_best_precision_aware
+/home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_01/01,0.6,0.65,8,,0.5047619047619047,0.018867924528301886,0.009523809523809525,,0.11137466307277628,,1,0,104,151,1,0.1,,
+/home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_01/02,0.6,0.65,128,,0.5047619047619047,0.018867924528301886,0.009523809523809525,,0.11137466307277628,,1,0,104,151,1,0.1,,
+/home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_02/01,0.75,0.65,8,,0.5047619047619047,0.0,0.0,,0.10095238095238096,,0,0,105,151,1,0.1,,
+/home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_02/02,0.75,0.65,128,,0.5047619047619047,0.018867924528301886,0.009523809523809525,,0.11137466307277628,,1,0,104,151,1,0.1,,
+/home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_03/01,0.8,0.65,128,,0.5047619047619047,0.018867924528301886,0.009523809523809525,,0.11137466307277628,,1,0,104,151,1,0.1,,
+/home/user/projects/train/model/long_window/CNN_BiLSTM/result_mask_sweep/run_04/01,0.85,0.65,128,,0.5047619047619047,0.018867924528301886,0.009523809523809525,,0.11137466307277628,,1,0,104,151,1,0.1,,

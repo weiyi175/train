@@ -1,0 +1,44 @@
+Focal sweep -> epochs=70 batch=16 acc=8 mask_threshold=0.6
+Class weights: 1.0:1.0 1.0:0.8 1.0:0.6 1.2:1.0 0.8:1.2
+Focal grid (alpha,gamma): 0.25,1.5 0.25,2.0 0.2,1.5 0.2,2.0 0.1,1.0 0.1,1.5 0.4,1.0 0.4,1.5
+# Wed Sep 17 02:47:36 CST 2025 -> class_weight=1.0:1.0, alpha=0.25, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw01_fg01
+# Wed Sep 17 02:49:11 CST 2025 -> class_weight=1.0:1.0, alpha=0.25, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw01_fg02
+# Wed Sep 17 02:50:18 CST 2025 -> class_weight=1.0:1.0, alpha=0.2, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw01_fg03
+# Wed Sep 17 02:50:40 CST 2025 -> class_weight=1.0:1.0, alpha=0.2, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw01_fg04
+# Wed Sep 17 02:52:06 CST 2025 -> class_weight=1.0:1.0, alpha=0.1, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw01_fg05
+# Wed Sep 17 02:53:40 CST 2025 -> class_weight=1.0:1.0, alpha=0.1, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw01_fg06
+# Wed Sep 17 02:54:52 CST 2025 -> class_weight=1.0:1.0, alpha=0.4, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw01_fg07
+# Wed Sep 17 02:56:14 CST 2025 -> class_weight=1.0:1.0, alpha=0.4, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw01_fg08
+# Wed Sep 17 02:57:47 CST 2025 -> class_weight=1.0:0.8, alpha=0.25, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw02_fg01
+# Wed Sep 17 02:59:20 CST 2025 -> class_weight=1.0:0.8, alpha=0.25, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw02_fg02
+# Wed Sep 17 03:00:24 CST 2025 -> class_weight=1.0:0.8, alpha=0.2, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw02_fg03
+# Wed Sep 17 03:01:26 CST 2025 -> class_weight=1.0:0.8, alpha=0.2, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw02_fg04
+# Wed Sep 17 03:01:53 CST 2025 -> class_weight=1.0:0.8, alpha=0.1, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw02_fg05
+# Wed Sep 17 03:03:26 CST 2025 -> class_weight=1.0:0.8, alpha=0.1, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw02_fg06
+# Wed Sep 17 03:03:47 CST 2025 -> class_weight=1.0:0.8, alpha=0.4, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw02_fg07
+# Wed Sep 17 03:05:14 CST 2025 -> class_weight=1.0:0.8, alpha=0.4, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw02_fg08
+# Wed Sep 17 03:06:38 CST 2025 -> class_weight=1.0:0.6, alpha=0.25, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw03_fg01
+# Wed Sep 17 03:07:38 CST 2025 -> class_weight=1.0:0.6, alpha=0.25, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw03_fg02
+# Wed Sep 17 03:09:00 CST 2025 -> class_weight=1.0:0.6, alpha=0.2, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw03_fg03
+# Wed Sep 17 03:10:15 CST 2025 -> class_weight=1.0:0.6, alpha=0.2, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw03_fg04
+# Wed Sep 17 03:11:49 CST 2025 -> class_weight=1.0:0.6, alpha=0.1, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw03_fg05
+# Wed Sep 17 03:12:56 CST 2025 -> class_weight=1.0:0.6, alpha=0.1, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw03_fg06
+# Wed Sep 17 03:14:24 CST 2025 -> class_weight=1.0:0.6, alpha=0.4, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw03_fg07
+# Wed Sep 17 03:14:45 CST 2025 -> class_weight=1.0:0.6, alpha=0.4, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw03_fg08
+# Wed Sep 17 03:16:05 CST 2025 -> class_weight=1.2:1.0, alpha=0.25, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg01
+# Wed Sep 17 03:17:36 CST 2025 -> class_weight=1.2:1.0, alpha=0.25, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg02
+# Wed Sep 17 03:18:24 CST 2025 -> class_weight=1.2:1.0, alpha=0.2, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg03
+# Wed Sep 17 03:19:19 CST 2025 -> class_weight=1.2:1.0, alpha=0.2, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg04
+# Wed Sep 17 03:19:44 CST 2025 -> class_weight=1.2:1.0, alpha=0.1, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg05
+# Wed Sep 17 03:20:50 CST 2025 -> class_weight=1.2:1.0, alpha=0.1, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg06
+# Wed Sep 17 03:21:38 CST 2025 -> class_weight=1.2:1.0, alpha=0.4, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg07
+# Wed Sep 17 03:22:57 CST 2025 -> class_weight=1.2:1.0, alpha=0.4, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg08
+# Wed Sep 17 03:24:30 CST 2025 -> class_weight=0.8:1.2, alpha=0.25, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw05_fg01
+# Wed Sep 17 03:25:54 CST 2025 -> class_weight=0.8:1.2, alpha=0.25, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw05_fg02
+# Wed Sep 17 03:26:57 CST 2025 -> class_weight=0.8:1.2, alpha=0.2, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw05_fg03
+# Wed Sep 17 03:27:56 CST 2025 -> class_weight=0.8:1.2, alpha=0.2, gamma_end=2.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw05_fg04
+# Wed Sep 17 03:28:23 CST 2025 -> class_weight=0.8:1.2, alpha=0.1, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw05_fg05
+# Wed Sep 17 03:29:31 CST 2025 -> class_weight=0.8:1.2, alpha=0.1, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw05_fg06
+# Wed Sep 17 03:30:01 CST 2025 -> class_weight=0.8:1.2, alpha=0.4, gamma_end=1.0 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw05_fg07
+# Wed Sep 17 03:31:30 CST 2025 -> class_weight=0.8:1.2, alpha=0.4, gamma_end=1.5 -> /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw05_fg08
+Focal sweep finished. Results in /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep

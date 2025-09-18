@@ -1,0 +1,62 @@
+# Reproducibility Report
+Run dir: /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/04
+Timestamp (UTC): 2025-09-13T01:26:32.473417Z
+Command: model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/train_videoswin.py --npz_path windows_v2_all.npz --preset tiny --epochs 1 --batch 4 --layer_decay 0.85 --freeze_epochs 1 --dynamic_threshold --auto_batch_probe --no_sampler --ema_f1 0.2 --seed 99
+Git commit: 44c2404115e815b62b7ee648d585ce8752c5c85b
+Python: 3.10.12 Torch: 2.3.1+cu121 Device: NVIDIA GeForce RTX 4070 SUPER
+--- Model ---
+preset: tiny
+window_size: (2, 7, 7)
+depths: None
+num_heads: None
+embed_dim: None
+drop_path_rate: None
+use_checkpoint: False
+param_count: 29124943
+single_logit: True
+--- Optimization ---
+epochs: 1
+batch_micro: 16
+accum: 1
+effective_batch: 16
+lr: 0.0003
+weight_decay: 0.05
+warmup_epochs: 2
+early_patience: 6
+min_delta: 0.0001
+no_early_stop: False
+pos_weight: 1.4543269230769231
+sampler_used: False
+balance_by_class: False
+amplify_hard_negative: False
+hard_negative_factor: 2.0
+temporal_jitter: 0
+focal_loss: False
+focal_gamma: 2.0
+ema_f1_alpha: 0.2
+--- Best Epoch Metrics ---
+epoch: 1
+loss: 0.8448623418807983
+lr: 0.00014765624999999997
+f1: 0.44549763033175355
+auc: 0.5640589569160999
+cm: [[91, 56], [61, 47]]
+acc: 0.5411764979362488
+f1_opt: 0.5988023952095809
+best_threshold: 0.39471812463884975
+f1_ema: 0.44549763033175355
+--- Last Epoch Metrics ---
+epoch: 1
+loss: 0.8448623418807983
+lr: 0.00014765624999999997
+f1: 0.44549763033175355
+auc: 0.5640589569160999
+cm: [[91, 56], [61, 47]]
+acc: 0.5411764979362488
+f1_opt: 0.5988023952095809
+best_threshold: 0.39471812463884975
+f1_ema: 0.44549763033175355
+--- Reproduce Command (suggested) ---
+/home/user/projects/train/.venv/bin/python /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/train_videoswin.py --npz_path /home/user/projects/train/train_data/Slipce_2/windows_v2_all.npz --preset tiny --epochs 1 --batch 16 --accum 1 --lr 0.0003 --warmup_epochs 2 --seed 99 --no_sampler --pos_weight 1.4543269230769231 --ema_f1 0.2 --val_ratio 0.2
+--- Notes ---
+Weights (.ckpt/.pt/.onnx) may be excluded from backup; this report plus seed & code commit allow retraining. Minor nondeterminism can arise from CUDA kernels unless fully deterministic settings are enforced.

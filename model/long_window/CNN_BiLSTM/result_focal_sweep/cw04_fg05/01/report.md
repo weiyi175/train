@@ -1,0 +1,22 @@
+# CNN_BiLSTM Report
+
+## Command
+```
+python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce/windows_npz.npz --epochs 70 --batch 16 --accumulate_steps 8 --result_dir /home/user/projects/train/model/long_window/CNN_BiLSTM/result_focal_sweep/cw04_fg05 --focal_alpha 0.1 --focal_gamma_start 0.0 --focal_gamma_end 1.0 --curriculum_epochs 20 --run_seed None --class_weight_neg 1.2 --class_weight_pos 1.0 --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean None  [auto-mask: occlusion_flag]
+```
+
+## Test metrics
+- AUC: 0.7308
+- F1: 0.1709
+- Recall: 0.0952
+## Confusion matrix (TP/FP/FN/TN)
+- TP: 10
+- FP: 2
+- FN: 95
+- TN: 149
+
+## Top 4 epochs by score = 0.5 * recall + 0.3 * f1 + 0.2 * auc
+- epoch 44: auc=0.7270, f1=0.5714, recall=0.4906, score=0.5621  TP: 26 FP: 12 FN: 27 TN: 63
+- epoch 46: auc=0.7381, f1=0.3797, recall=0.2830, score=0.4031  TP: 15 FP: 11 FN: 38 TN: 64
+- epoch 42: auc=0.7358, f1=0.2687, recall=0.1698, score=0.3127  TP: 9 FP: 5 FN: 44 TN: 70
+- epoch 36: auc=0.7313, f1=0.2647, recall=0.1698, score=0.3106  TP: 9 FP: 6 FN: 44 TN: 69

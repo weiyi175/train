@@ -1,0 +1,5 @@
+synthetic://sample/0010.npz	1.458246
+synthetic://sample/0008.npz	1.073610
+synthetic://sample/0020.npz	0.954043
+synthetic://sample/0009.npz	0.934071
+synthetic://sample/0015.npz	0.930879

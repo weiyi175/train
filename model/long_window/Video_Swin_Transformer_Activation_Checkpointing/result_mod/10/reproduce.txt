@@ -1,0 +1,70 @@
+# Reproducibility Report
+Run dir: /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/result_mod/10
+Timestamp (UTC): 2025-09-13T01:47:25.993734Z
+Command: model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/train_videoswin.py --npz_path windows_v2_all.npz --preset tiny --epochs 1 --batch 2 --layer_decay 0.9 --freeze_epochs 0 --dynamic_threshold --auto_batch_probe --no_sampler --ema_f1 0.2 --seed 11 --feature_pack --fp_components velocity,accel,energy
+Git commit: 44c2404115e815b62b7ee648d585ce8752c5c85b
+Python: 3.10.12 Torch: 2.3.1+cu121 Device: NVIDIA GeForce RTX 4070 SUPER
+--- Model ---
+preset: tiny
+window_size: (2, 7, 7)
+depths: None
+num_heads: None
+embed_dim: None
+drop_path_rate: None
+use_checkpoint: False
+param_count: 29128015
+single_logit: True
+--- Optimization ---
+epochs: 1
+batch_micro: 8
+accum: 1
+effective_batch: 8
+lr: 0.0003
+weight_decay: 0.05
+warmup_epochs: 2
+early_patience: 6
+min_delta: 0.0001
+no_early_stop: False
+pos_weight: 1.3744186046511628
+sampler_used: False
+balance_by_class: False
+amplify_hard_negative: False
+hard_negative_factor: 2.0
+temporal_jitter: 0
+focal_loss: False
+focal_gamma: 2.0
+ema_f1_alpha: 0.2
+layer_decay: 0.9
+freeze_epochs: 0
+dynamic_threshold: True
+auto_batch_probe: True
+max_probe_batch: None
+--- Best Epoch Metrics ---
+epoch: 1
+loss: 0.8918123641051352
+lr: 0.00014882812499999998
+f1: 0.14814814814814814
+auc: 0.5218052068190828
+cm: [[155, 6], [86, 8]]
+acc: 0.6392157077789307
+f1_opt: 0.5491525423728812
+best_threshold: 0.4439797220218122
+f1_ema: 0.14814814814814814
+--- Last Epoch Metrics ---
+epoch: 1
+loss: 0.8918123641051352
+lr: 0.00014882812499999998
+f1: 0.14814814814814814
+auc: 0.5218052068190828
+cm: [[155, 6], [86, 8]]
+acc: 0.6392157077789307
+f1_opt: 0.5491525423728812
+best_threshold: 0.4439797220218122
+f1_ema: 0.14814814814814814
+--- Dynamic Threshold ---
+best_threshold (epoch 1): 0.4439797220218122
+best_f1_opt: 0.5491525423728812
+--- Reproduce Command (suggested) ---
+/home/user/projects/train/.venv/bin/python /home/user/projects/train/model/long_window/Video_Swin_Transformer_Activation_Checkpointing/scripts/train_videoswin.py --npz_path /home/user/projects/train/train_data/Slipce_2/windows_v2_all.npz --preset tiny --epochs 1 --batch 8 --accum 1 --lr 0.0003 --warmup_epochs 2 --seed 11 --no_sampler --pos_weight 1.3744186046511628 --ema_f1 0.2 --val_ratio 0.2 --feature_pack --fp_components velocity,accel,energy
+--- Notes ---
+Weights (.ckpt/.pt/.onnx) may be excluded from backup; this report plus seed & code commit allow retraining. Minor nondeterminism can arise from CUDA kernels unless fully deterministic settings are enforced.
