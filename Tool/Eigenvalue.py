@@ -502,19 +502,21 @@ def write_feature_csv(path: str, features: List[Dict[str, float]]):
 			writer.writerow(row)
 
 
-def process_all():
-	if not os.path.isdir(POSE_INPUT_DIR):
-		print(f"⚠️ Pose 輸入資料夾不存在: {POSE_INPUT_DIR}")
+def process_all(pose_dir: str = POSE_INPUT_DIR, out_dir: str = FEATURE_OUTPUT_DIR):
+	"""批次處理 pose CSV -> eigen 特徵 CSV。
+	可透過參數覆寫輸入/輸出路徑 (供測試或重建 test 資料集)。"""
+	if not os.path.isdir(pose_dir):
+		print(f"⚠️ Pose 輸入資料夾不存在: {pose_dir}")
 		return
-	os.makedirs(FEATURE_OUTPUT_DIR, exist_ok=True)
-	pose_files = [f for f in os.listdir(POSE_INPUT_DIR) if f.endswith("_pose.csv")]
+	os.makedirs(out_dir, exist_ok=True)
+	pose_files = [f for f in os.listdir(pose_dir) if f.endswith("_pose.csv")]
 	if not pose_files:
 		print("⚠️ 沒有找到 *_pose.csv")
 		return
 	for fname in pose_files:
-		in_path = os.path.join(POSE_INPUT_DIR, fname)
+		in_path = os.path.join(pose_dir, fname)
 		out_name = fname.replace("_pose.csv", "_eig.csv")
-		out_path = os.path.join(FEATURE_OUTPUT_DIR, out_name)
+		out_path = os.path.join(out_dir, out_name)
 		try:
 			frames = read_pose_csv(in_path)
 			feats = compute_features(frames)
@@ -524,7 +526,7 @@ def process_all():
 			print(f"❌ 處理失敗 {fname}: {e}")
 
 	# 生成 schema 說明
-	schema_path = os.path.join(FEATURE_OUTPUT_DIR, "feature_schema.json")
+	schema_path = os.path.join(out_dir, "feature_schema.json")
 	try:
 		import json
 		schema: Dict[str, Dict[str, str]] = {}
@@ -600,8 +602,16 @@ def process_all():
 		print(f"⚠️ 無法寫入 schema: {e}")
 
 
+def main():
+	import argparse
+	ap = argparse.ArgumentParser(description="Compute Eigenvalue features (hand-mouth distances, normalized metrics, dynamics).")
+	ap.add_argument("--pose_dir", default=POSE_INPUT_DIR, help="輸入 pose CSV 目錄 (含 *_pose.csv)")
+	ap.add_argument("--out_dir", default=FEATURE_OUTPUT_DIR, help="輸出 eigen 特徵目錄")
+	args = ap.parse_args()
+	print(f"[INFO] 來源目錄: {args.pose_dir}")
+	print(f"[INFO] 輸出目錄: {args.out_dir}")
+	process_all(args.pose_dir, args.out_dir)
+
 if __name__ == "__main__":
-	print(f"[INFO] 來源目錄: {POSE_INPUT_DIR}")
-	print(f"[INFO] 輸出目錄: {FEATURE_OUTPUT_DIR}")
-	process_all()
+	main()
 

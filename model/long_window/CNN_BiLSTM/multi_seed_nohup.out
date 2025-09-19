@@ -1,0 +1,51 @@
+Running seeds: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+Checkpoint metric: precision_aware  Parallel: 4  Result base: result_multi_seed_precision_aware
+[launch] seed=1 -> result_multi_seed_precision_aware/seed1
+[launch] seed=2 -> result_multi_seed_precision_aware/seed2
+[launch] seed=3 -> result_multi_seed_precision_aware/seed3
+[launch] seed=4 -> result_multi_seed_precision_aware/seed4
+[done] seed 1 finished
+[launch] seed=5 -> result_multi_seed_precision_aware/seed5
+[done] seed 2 finished
+[done] seed 3 finished
+[done] seed 4 finished
+[launch] seed=6 -> result_multi_seed_precision_aware/seed6
+[launch] seed=7 -> result_multi_seed_precision_aware/seed7
+[launch] seed=8 -> result_multi_seed_precision_aware/seed8
+[done] seed 5 finished
+[launch] seed=9 -> result_multi_seed_precision_aware/seed9
+[done] seed 6 finished
+[done] seed 7 finished
+[done] seed 8 finished
+[launch] seed=10 -> result_multi_seed_precision_aware/seed10
+[launch] seed=11 -> result_multi_seed_precision_aware/seed11
+[launch] seed=12 -> result_multi_seed_precision_aware/seed12
+[done] seed 9 finished
+[launch] seed=13 -> result_multi_seed_precision_aware/seed13
+[done] seed 10 finished
+[done] seed 11 finished
+[launch] seed=14 -> result_multi_seed_precision_aware/seed14
+[launch] seed=15 -> result_multi_seed_precision_aware/seed15
+[done] seed 12 finished
+[launch] seed=16 -> result_multi_seed_precision_aware/seed16
+[done] seed 13 finished
+[launch] seed=17 -> result_multi_seed_precision_aware/seed17
+[done] seed 14 finished
+[done] seed 15 finished
+[launch] seed=18 -> result_multi_seed_precision_aware/seed18
+[launch] seed=19 -> result_multi_seed_precision_aware/seed19
+[done] seed 16 finished
+[launch] seed=20 -> result_multi_seed_precision_aware/seed20
+[done] seed 17 finished
+All seeds launched. Waiting for remaining: 18 19 20
+Remaining: 18 19 20
+Remaining: 18 19 20
+[done] seed 19 finished
+[done] seed 20 finished
+Remaining: 18
+Remaining: 18
+Remaining: 18
+Remaining: 18
+[done] seed 18 finished
+Remaining: 
+Multi-seed run complete: result_multi_seed_precision_aware

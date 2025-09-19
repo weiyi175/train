@@ -9,6 +9,75 @@ from model import build_cnn_bilstm, mlp_attention
 from losses import FocalLoss
 from utils import next_result_dir, save_json, load_npz_windows
 
+# --- Feature alignment quick check (train/test feature_list parity) ---
+# Called early in main(). Non-fatal; prints WARNING if mismatch.
+# Env: set SKIP_FEATURE_CHECK=1 to bypass.
+
+def _safe_feature_list(npz_path: str):
+    try:
+        if not os.path.exists(npz_path):
+            return None
+        d = np.load(npz_path, allow_pickle=True)
+        if 'feature_list' in d:
+            fl = d['feature_list']
+            # feature_list may be stored as object array -> convert to python list
+            if isinstance(fl, np.ndarray):
+                try:
+                    fl = fl.tolist()
+                except Exception:
+                    pass
+            return list(fl)
+    except Exception:
+        return None
+    return None
+
+def verify_feature_alignment(train_npz: str, test_npz: str):
+    if os.environ.get('SKIP_FEATURE_CHECK'):
+        print('[feature_check] SKIP_FEATURE_CHECK set -> skipping feature alignment check.')
+        return
+    if not train_npz or not test_npz:
+        print('[feature_check] train/test npz path not provided; skip.')
+        return
+    train_list = _safe_feature_list(train_npz)
+    test_list = _safe_feature_list(test_npz)
+    if train_list is None:
+        print(f"[feature_check] INFO: Cannot read feature_list from train file: {train_npz}")
+        return
+    if test_list is None:
+        print(f"[feature_check] INFO: Cannot read feature_list from test file: {test_npz}")
+        return
+    if len(train_list) != len(test_list):
+        print(f"[feature_check] WARNING: feature count mismatch train={len(train_list)} test={len(test_list)}")
+    # Compare ordered
+    if train_list == test_list:
+        print(f"[feature_check] OK: train/test feature_list identical (n={len(train_list)})")
+        return
+    # Order or membership differs -> report diff summary
+    set_train = set(train_list)
+    set_test = set(test_list)
+    missing = [f for f in train_list if f not in set_test]
+    extra = [f for f in test_list if f not in set_train]
+    # Build mapping (position differences)
+    moved = []
+    common = set_train.intersection(set_test)
+    for f in common:
+        i_tr = train_list.index(f)
+        i_te = test_list.index(f)
+        if i_tr != i_te:
+            moved.append((f, i_tr, i_te))
+    print('[feature_check] WARNING: feature_list differs:')
+    if missing:
+        print('  - Missing in test:', missing[:15], ('...(+more)' if len(missing) > 15 else ''))
+    if extra:
+        print('  - Extra in test:', extra[:15], ('...(+more)' if len(extra) > 15 else ''))
+    if moved and not (missing or extra):
+        # only ordering issue
+        print('  - Reordered features (first 15 shown):', moved[:15])
+        print('  - Suggestion: regenerate windows to enforce consistent ordering or reorder at load time.')
+    else:
+        if moved:
+            print('  - Also moved features (first 15 shown):', moved[:15])
+    print('  - Suggested action: run check_feature_alignment.py to inspect full diff or regenerate test windows.')
 
 class AccumModel(tf.keras.Model):
     """Keras Model with gradient accumulation.
@@ -152,6 +221,8 @@ class CurriculumCallback(tf.keras.callbacks.Callback):
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument('--windows', default='/home/user/projects/train/train_data/slipce/windows_npz.npz')
+    p.add_argument('--val_windows', default=None, help='Optional separate validation set NPZ (if provided, disable internal split)')
+    p.add_argument('--test_windows', default='/home/user/projects/train/test_data/slipce/windows_npz.npz', help='Optional separate test set NPZ. If provided alone (without --val_windows), internal split provides train/val and this file is used purely as external test. Default set to test_data/slipce/windows_npz.npz')
     p.add_argument('--epochs', type=int, default=70)
     p.add_argument('--batch', type=int, default=16)
     p.add_argument('--accumulate_steps', type=int, default=8, help='Accumulate gradients over N steps to simulate larger effective batch')
@@ -175,6 +246,15 @@ def parse_args():
 
 def main():
     args = parse_args()
+    # Early feature alignment check (if external val/test provided). Use args.windows as train set; val/test precedence for test.
+    test_npz_for_check = args.test_windows if args.test_windows else (args.val_windows if args.val_windows else None)
+    try:
+        if test_npz_for_check:
+            verify_feature_alignment(args.windows, test_npz_for_check)
+        else:
+            print('[feature_check] No external test/val provided -> skipped (internal split will reuse same NPZ).')
+    except Exception as e:
+        print('[feature_check] ERROR during verification:', e)
     # Prefer GPU if available: enable memory growth and print device info
     try:
         gpus = tf.config.list_physical_devices('GPU')
@@ -199,43 +279,164 @@ def main():
     _eff_batch = int(args.batch) * int(max(1, args.accumulate_steps))
     print(f'Config: batch={args.batch}, accumulate_steps={args.accumulate_steps} -> effective_batch={_eff_batch}')
 
-    X, y = load_npz_windows(args.windows)
-    print('Loaded', X.shape, y.shape)
-    y = y.flatten().astype(int)
+    def derive_mask(path):
+        try:
+            base = np.load(path, allow_pickle=True)
+            feat_names = list(base['feature_list'].tolist()) if 'feature_list' in base else None
+            key_raw = 'long_raw' if 'long_raw' in base else ('short_raw' if 'short_raw' in base else None)
+            X_raw = base[key_raw] if key_raw else None
+            if feat_names is not None and 'occlusion_flag' in feat_names and X_raw is not None:
+                ch = feat_names.index('occlusion_flag')
+                m = np.asarray(X_raw)[:, ch, :]
+                mt = np.clip(m, 0.0, 1.0).astype(np.float32)
+                print(f'[mask] {os.path.basename(path)} using occlusion_flag ch={ch}')
+                return mt
+            elif X_raw is not None:
+                mt = np.clip(np.asarray(X_raw)[:, -1, :], 0.0, 1.0).astype(np.float32)
+                print(f'[mask] {os.path.basename(path)} using last raw channel (fallback)')
+                return mt
+        except Exception as e:
+            print('[mask] derive failed for', path, '->', e)
+        return None
 
-    # Use index-based splits to keep masks aligned
-    idx = np.arange(len(X))
-    tr_idx, te_idx = train_test_split(idx, test_size=0.2, stratify=y, random_state=42)
-    tr_idx2, va_idx = train_test_split(tr_idx, test_size=0.125, stratify=y[tr_idx], random_state=42)
-    X_train, y_train = X[tr_idx2], y[tr_idx2]
-    X_val, y_val = X[va_idx], y[va_idx]
-    X_test, y_test = X[te_idx], y[te_idx]
-
-    input_shape = X.shape[1:]
-    # Derive attention mask by default from raw occlusion_flag if available.
-    # If derivation fails, we proceed without mask.
     MASK_MODE = args.mask_mode
     MASK_THRESHOLD = float(args.mask_threshold)
-    mask_tensor = None
-    try:
-        base = np.load(args.windows, allow_pickle=True)
-        feat_names = list(base['feature_list'].tolist()) if 'feature_list' in base else None
-        key_raw = 'long_raw' if 'long_raw' in base else ('short_raw' if 'short_raw' in base else None)
-        X_raw = base[key_raw] if key_raw else None
-        if feat_names is not None and 'occlusion_flag' in feat_names and X_raw is not None:
-            ch = feat_names.index('occlusion_flag')
-            m = np.asarray(X_raw)[:, ch, :]
-            mask_tensor = np.clip(m, 0.0, 1.0).astype(np.float32)
-            print(f'Using mask channel "occlusion_flag" from {key_raw} (index {ch})')
-        elif X_raw is not None:
-            # cautious fallback if feature list missing
-            mask_tensor = np.clip(np.asarray(X_raw)[:, -1, :], 0.0, 1.0).astype(np.float32)
-            print('Using last raw channel as mask (fallback)')
-    except Exception as e:
-        print('Warning: failed to derive mask from windows NPZ ->', e)
-        mask_tensor = None
+    external_val = args.val_windows is not None
+    external_test_only = (args.val_windows is None and args.test_windows is not None)
+    if external_val:
+        # Load full training set
+        X_train, y_train = load_npz_windows(args.windows)
+        y_train = y_train.flatten().astype(int)
+        print(f'Loaded TRAIN full: {X_train.shape} from {args.windows}')
+        # Validation set
+        X_val, y_val = load_npz_windows(args.val_windows)
+        y_val = y_val.flatten().astype(int)
+        print(f'Loaded VAL full: {X_val.shape} from {args.val_windows}')
+        # Test (optional)
+        if args.test_windows:
+            X_test, y_test = load_npz_windows(args.test_windows)
+            y_test = y_test.flatten().astype(int)
+            print(f'Loaded TEST full: {X_test.shape} from {args.test_windows}')
+        else:
+            X_test, y_test = X_val, y_val
+            print('No --test_windows given; using validation set as test evaluation.')
+        input_shape = X_train.shape[1:]
 
-    use_mask = mask_tensor is not None
+        # --- Time axis alignment (pad/truncate) ---
+        def align_time(arr, target_T):
+            if arr.shape[1] == target_T:
+                return arr
+            cur_T = arr.shape[1]
+            if cur_T > target_T:
+                print(f'[time-align] truncate from T={cur_T} -> {target_T}')
+                return arr[:, :target_T, :]
+            # pad
+            pad_T = target_T - cur_T
+            print(f'[time-align] pad from T={cur_T} -> {target_T} (pad {pad_T})')
+            pad_block = np.zeros((arr.shape[0], pad_T, arr.shape[2]), dtype=arr.dtype)
+            return np.concatenate([arr, pad_block], axis=1)
+
+        train_T = X_train.shape[1]
+        if X_val.shape[1] != train_T or X_test.shape[1] != train_T:
+            X_val = align_time(X_val, train_T)
+            if X_test is X_val:
+                # already aligned above
+                pass
+            else:
+                X_test = align_time(X_test, train_T)
+            print(f'[time-align] final shapes -> train {X_train.shape}, val {X_val.shape}, test {X_test.shape}')
+
+        m_train = derive_mask(args.windows)
+        m_val = derive_mask(args.val_windows)
+        m_test = derive_mask(args.test_windows) if args.test_windows else (m_val if X_test is X_val else None)
+
+        # Align masks if needed
+        def align_mask(mask, target_T):
+            if mask is None:
+                return None
+            if mask.shape[1] == target_T:
+                return mask
+            cur_T = mask.shape[1]
+            if cur_T > target_T:
+                return mask[:, :target_T]
+            pad_T = target_T - cur_T
+            return np.concatenate([mask, np.zeros((mask.shape[0], pad_T), dtype=mask.dtype)], axis=1)
+
+        if m_train is not None:
+            target_T = X_train.shape[1]
+            m_train = align_mask(m_train, target_T)
+            m_val = align_mask(m_val, target_T)
+            m_test = align_mask(m_test, target_T)
+        # Consistency: only use mask if all three available with matching lengths
+        use_mask = (m_train is not None and m_val is not None and m_test is not None
+                    and len(m_train)==len(X_train) and len(m_val)==len(X_val) and len(m_test)==len(X_test))
+        if not use_mask:
+            m_train = m_val = m_test = None
+            print('[mask] Disabled (incomplete across external splits)')
+    elif external_test_only:
+        # Internal split for train/val from --windows; external test loaded from --test_windows
+        X, y = load_npz_windows(args.windows)
+        print('Loaded (for internal train/val) ', X.shape, y.shape)
+        y = y.flatten().astype(int)
+        idx = np.arange(len(X))
+        tr_idx, te_idx_internal = train_test_split(idx, test_size=0.2, stratify=y, random_state=42)
+        tr_idx2, va_idx = train_test_split(tr_idx, test_size=0.125, stratify=y[tr_idx], random_state=42)
+        X_train, y_train = X[tr_idx2], y[tr_idx2]
+        X_val, y_val = X[va_idx], y[va_idx]
+        # External test
+        X_test, y_test = load_npz_windows(args.test_windows)
+        y_test = y_test.flatten().astype(int)
+        print(f'Loaded EXTERNAL TEST: {X_test.shape} from {args.test_windows}')
+        input_shape = X.shape[1:]
+        mask_tensor = derive_mask(args.windows)
+        test_mask_tensor = derive_mask(args.test_windows)
+        use_mask = (mask_tensor is not None and test_mask_tensor is not None)
+        if use_mask:
+            m_train, m_val = mask_tensor[tr_idx2], mask_tensor[va_idx]
+            m_test = test_mask_tensor
+        else:
+            m_train = m_val = m_test = None
+        # Align time axis of external test to train if mismatch
+        def align_time(arr, target_T):
+            if arr.shape[1] == target_T:
+                return arr
+            cur_T = arr.shape[1]
+            if cur_T > target_T:
+                print(f'[time-align] truncate test from T={cur_T} -> {target_T}')
+                return arr[:, :target_T, :]
+            pad_T = target_T - cur_T
+            print(f'[time-align] pad test from T={cur_T} -> {target_T} (+{pad_T})')
+            pad_block = np.zeros((arr.shape[0], pad_T, arr.shape[2]), dtype=arr.dtype)
+            return np.concatenate([arr, pad_block], axis=1)
+        train_T = X_train.shape[1]
+        if X_test.shape[1] != train_T:
+            X_test = align_time(X_test, train_T)
+            if use_mask and m_test is not None and m_test.shape[1] != train_T:
+                # Adjust mask sequence length
+                cur_T = m_test.shape[1]
+                if cur_T > train_T:
+                    m_test = m_test[:, :train_T]
+                else:
+                    pad_T = train_T - cur_T
+                    m_test = np.concatenate([m_test, np.zeros((m_test.shape[0], pad_T), dtype=m_test.dtype)], axis=1)
+    else:
+        # Original internal stratified split (train/val/test = 0.7/0.1/0.2)
+        X, y = load_npz_windows(args.windows)
+        print('Loaded', X.shape, y.shape)
+        y = y.flatten().astype(int)
+        idx = np.arange(len(X))
+        tr_idx, te_idx = train_test_split(idx, test_size=0.2, stratify=y, random_state=42)
+        tr_idx2, va_idx = train_test_split(tr_idx, test_size=0.125, stratify=y[tr_idx], random_state=42)
+        X_train, y_train = X[tr_idx2], y[tr_idx2]
+        X_val, y_val = X[va_idx], y[va_idx]
+        X_test, y_test = X[te_idx], y[te_idx]
+        input_shape = X.shape[1:]
+        mask_tensor = derive_mask(args.windows)
+        use_mask = mask_tensor is not None
+        if use_mask:
+            m_train, m_val, m_test = mask_tensor[tr_idx2], mask_tensor[va_idx], mask_tensor[te_idx]
+        else:
+            m_train = m_val = m_test = None
 
     base_model = build_cnn_bilstm(
         input_shape,
@@ -281,11 +482,9 @@ def main():
         early = tf.keras.callbacks.EarlyStopping(monitor=monitor_name, mode='max', patience=10, restore_best_weights=True)
 
     # Prepare validation inputs (with mask if available)
-    if use_mask and mask_tensor is not None:
-        m_train, m_val, m_test = mask_tensor[tr_idx2], mask_tensor[va_idx], mask_tensor[te_idx]
+    if use_mask and m_val is not None:
         X_val_inputs = [X_val, m_val]
     else:
-        m_train = m_val = m_test = None
         X_val_inputs = X_val
 
     val_metric_cb = ValMetricsCallback(X_val, y_val, X_val_inputs=X_val_inputs, val_mask=m_val, window_mask_min_mean=args.window_mask_min_mean)
@@ -302,7 +501,7 @@ def main():
         w_pos = float(args.class_weight_pos) if args.class_weight_pos is not None else 1.0
         class_weight = {0: w_neg, 1: w_pos}
 
-    if use_mask and mask_tensor is not None:
+    if use_mask and m_train is not None:
         hist = model.fit(
             [X_train, m_train], y_train,
             epochs=args.epochs, batch_size=args.batch,
@@ -324,7 +523,15 @@ def main():
         except Exception as e:
             print('Warning: failed to load weights from', chk_path, '->', e)
 
-    if use_mask and mask_tensor is not None:
+    # Save final weights for ensemble averaging
+    final_weights_path = os.path.join(folder, 'final.weights')
+    try:
+        model.save_weights(final_weights_path)
+        print(f'Saved final weights to {final_weights_path}')
+    except Exception as e:
+        print(f'Warning: failed to save final weights -> {e}')
+
+    if use_mask and m_test is not None:
         probs = model.predict([X_test, m_test], verbose=0)
     else:
         probs = model.predict(X_test, verbose=0)

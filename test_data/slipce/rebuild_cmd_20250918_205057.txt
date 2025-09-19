@@ -1,0 +1,1 @@
+Running: python3 Tool/slipce.py --eigen_dir /home/user/projects/train/test_data/Eigenvalue --label_dir /home/user/projects/train/test_data/VIA_smoke_nosmoke --output_dir /home/user/projects/train/test_data/slipce --short_win 30 --short_stride 15 --long_win 75 --long_stride 40 --smoke_ratio_thresh 0.5 --long_norm_scope video --export_npz --export_npz_dense --seed 123

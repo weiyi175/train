@@ -1,0 +1,44 @@
+{
+  "ensemble_config": {
+    "k": 10,
+    "metric": "precision_aware",
+    "total_models": 10,
+    "selected_seeds": [
+      9,
+      46,
+      39,
+      49,
+      29,
+      37,
+      40,
+      5,
+      33,
+      17
+    ]
+  },
+  "ensemble_metrics": {
+    "auc": 0.8789576396784148,
+    "f1": 0.7717690192483959,
+    "recall": 0.8034351145038168,
+    "precision": 0.7425044091710759,
+    "composite": 0.8090397909621101,
+    "precision_aware": 0.7785744382957397,
+    "confusion_matrix": {
+      "tp": 421,
+      "fp": 146,
+      "fn": 103,
+      "tn": 606
+    }
+  },
+  "best_individual": {
+    "seed": 9,
+    "auc": 0.7256553708439898,
+    "f1": 0.676056338028169,
+    "precision_aware": 0.6988251685597048
+  },
+  "improvements": {
+    "auc": 0.153302268834425,
+    "f1": 0.09571268122022691,
+    "precision_aware": 0.07974926973603491
+  }
+}

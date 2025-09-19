@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Multi-scale sliding window slicing for smoking action dataset.
 
 功能概要:
@@ -154,8 +156,6 @@ dataset_npz.py 提供 WindowsNPZDataset 與 build_dataloader（需安裝 PyTorch
 analyze_windows.py：快速檢查類別分佈、smoke_ratio、phase、長視窗摘要與 fps。
 verify_dense_meta.py：核對 dense NPZ meta 與 CSV 清單一致性（回溯與 overlay 需要）。
 """
-from __future__ import annotations
-
 import os
 import csv
 import math

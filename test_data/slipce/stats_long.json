@@ -6,5 +6,5 @@
   "win_size": 75,
   "stride": 40,
   "norm_type": "video_zscore",
-  "feature_count": 34
+  "feature_count": 36
 }

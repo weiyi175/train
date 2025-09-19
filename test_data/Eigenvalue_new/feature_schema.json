@@ -1,0 +1,536 @@
+{
+  "frame": {
+    "description": "幀索引"
+  },
+  "time_sec": {
+    "description": "時間 (秒)"
+  },
+  "yaw_est": {
+    "description": "Clamp 後臉部 yaw (-1~1)"
+  },
+  "yaw_raw_ratio": {
+    "description": "未 clamp 前 nose 在眼睛線段比例 (可超出 0~1)"
+  },
+  "yaw_valid_flag": {
+    "description": "yaw 是否有效 (1 有效 / 0 無)"
+  },
+  "face_orient_class": {
+    "description": "臉方向分類 -1 左 0 正 1 右"
+  },
+  "mouth_x": {
+    "description": "嘴中心 X"
+  },
+  "mouth_y": {
+    "description": "嘴中心 Y"
+  },
+  "mouth_z": {
+    "description": "嘴中心 Z"
+  },
+  "mouth_width_3d": {
+    "description": "嘴左右點 3D 距離"
+  },
+  "mouth_width_2d": {
+    "description": "嘴左右點 2D (XY) 距離"
+  },
+  "normalized_mouth_width": {
+    "description": "嘴寬 2D / 肩寬 2D (首幀若缺失為 NaN)"
+  },
+  "mouth_conf_raw": {
+    "description": "嘴點原始平均可見度"
+  },
+  "mouth_conf_adj": {
+    "description": "嘴點調整後可見度"
+  },
+  "mouth_from_estimation": {
+    "description": "是否估算嘴 (1 是)"
+  },
+  "mouth_vx": {
+    "description": "嘴中心速度 x (首幀=0)"
+  },
+  "mouth_vy": {
+    "description": "嘴中心速度 y (首幀=0)"
+  },
+  "mouth_vz": {
+    "description": "嘴中心速度 z (首幀=0)"
+  },
+  "mouth_ax": {
+    "description": "嘴中心加速度 x (首幀=0)"
+  },
+  "mouth_ay": {
+    "description": "嘴中心加速度 y (首幀=0)"
+  },
+  "mouth_az": {
+    "description": "嘴中心加速度 z (首幀=0)"
+  },
+  "dist_leftHand_mouth": {
+    "description": "左手-嘴 3D 距離"
+  },
+  "dist_rightHand_mouth": {
+    "description": "右手-嘴 3D 距離"
+  },
+  "dist_hands": {
+    "description": "雙手 3D 距離"
+  },
+  "dist_nose_leftHand": {
+    "description": "鼻-左手 3D 距離"
+  },
+  "dist_nose_rightHand": {
+    "description": "鼻-右手 3D 距離"
+  },
+  "dist_wrists": {
+    "description": "雙腕 3D 距離"
+  },
+  "dist2d_leftHand_mouth": {
+    "description": "左手-嘴 2D 距離"
+  },
+  "dist2d_rightHand_mouth": {
+    "description": "右手-嘴 2D 距離"
+  },
+  "dist2d_hands": {
+    "description": "雙手 2D 距離"
+  },
+  "dist2d_nose_leftHand": {
+    "description": "鼻-左手 2D 距離"
+  },
+  "dist2d_nose_rightHand": {
+    "description": "鼻-右手 2D 距離"
+  },
+  "dist2d_wrists": {
+    "description": "雙腕 2D 距離"
+  },
+  "norm_dist_leftHand_mouth": {
+    "description": "左手-嘴 3D 距離 / 肩寬 3D"
+  },
+  "norm_dist_rightHand_mouth": {
+    "description": "右手-嘴 3D 距離 / 肩寬 3D"
+  },
+  "norm_dist_hands": {
+    "description": "雙手 3D 距離 / 肩寬 3D"
+  },
+  "norm_dist_nose_leftHand": {
+    "description": "鼻-左手 3D 距離 / 肩寬 3D"
+  },
+  "norm_dist_nose_rightHand": {
+    "description": "鼻-右手 3D 距離 / 肩寬 3D"
+  },
+  "norm_dist_wrists": {
+    "description": "雙腕 3D 距離 / 肩寬 3D"
+  },
+  "norm2d_dist_leftHand_mouth": {
+    "description": "左手-嘴 2D 距離 / 肩寬 2D"
+  },
+  "norm2d_dist_rightHand_mouth": {
+    "description": "右手-嘴 2D 距離 / 肩寬 2D"
+  },
+  "norm2d_dist_hands": {
+    "description": "雙手 2D 距離 / 肩寬 2D"
+  },
+  "norm2d_dist_nose_leftHand": {
+    "description": "鼻-左手 2D 距離 / 肩寬 2D"
+  },
+  "norm2d_dist_nose_rightHand": {
+    "description": "鼻-右手 2D 距離 / 肩寬 2D"
+  },
+  "norm2d_dist_wrists": {
+    "description": "雙腕 2D 距離 / 肩寬 2D"
+  },
+  "shoulder_width_3d": {
+    "description": "左右肩 3D 距離"
+  },
+  "shoulder_width_2d": {
+    "description": "左右肩 2D 距離"
+  },
+  "occlusion_flag": {
+    "description": "嘴被任一手接近遮擋"
+  },
+  "velocity_jump_flag": {
+    "description": "多 landmark 異常跳變綜合旗標 (>=JUMP_MIN_LANDMARKS)"
+  },
+  "velocity_jump_count": {
+    "description": "本幀超過 robust 門檻 (速度或加速度) 的 landmark 數"
+  },
+  "velocity_jump_v_thresh_used": {
+    "description": "使用的速度 magnitude robust 門檻 (max(基礎,median+k*IQR))"
+  },
+  "velocity_jump_a_thresh_used": {
+    "description": "使用的加速度 magnitude robust 門檻 (max(基礎,median+k*IQR))"
+  },
+  "l0_vx": {
+    "description": "landmark 0 vx (首幀=0)"
+  },
+  "l0_vy": {
+    "description": "landmark 0 vy (首幀=0)"
+  },
+  "l0_vz": {
+    "description": "landmark 0 vz (首幀=0)"
+  },
+  "l0_ax": {
+    "description": "landmark 0 ax (首幀=0)"
+  },
+  "l0_ay": {
+    "description": "landmark 0 ay (首幀=0)"
+  },
+  "l0_az": {
+    "description": "landmark 0 az (首幀=0)"
+  },
+  "l1_vx": {
+    "description": "landmark 1 vx (首幀=0)"
+  },
+  "l1_vy": {
+    "description": "landmark 1 vy (首幀=0)"
+  },
+  "l1_vz": {
+    "description": "landmark 1 vz (首幀=0)"
+  },
+  "l1_ax": {
+    "description": "landmark 1 ax (首幀=0)"
+  },
+  "l1_ay": {
+    "description": "landmark 1 ay (首幀=0)"
+  },
+  "l1_az": {
+    "description": "landmark 1 az (首幀=0)"
+  },
+  "l2_vx": {
+    "description": "landmark 2 vx (首幀=0)"
+  },
+  "l2_vy": {
+    "description": "landmark 2 vy (首幀=0)"
+  },
+  "l2_vz": {
+    "description": "landmark 2 vz (首幀=0)"
+  },
+  "l2_ax": {
+    "description": "landmark 2 ax (首幀=0)"
+  },
+  "l2_ay": {
+    "description": "landmark 2 ay (首幀=0)"
+  },
+  "l2_az": {
+    "description": "landmark 2 az (首幀=0)"
+  },
+  "l3_vx": {
+    "description": "landmark 3 vx (首幀=0)"
+  },
+  "l3_vy": {
+    "description": "landmark 3 vy (首幀=0)"
+  },
+  "l3_vz": {
+    "description": "landmark 3 vz (首幀=0)"
+  },
+  "l3_ax": {
+    "description": "landmark 3 ax (首幀=0)"
+  },
+  "l3_ay": {
+    "description": "landmark 3 ay (首幀=0)"
+  },
+  "l3_az": {
+    "description": "landmark 3 az (首幀=0)"
+  },
+  "l4_vx": {
+    "description": "landmark 4 vx (首幀=0)"
+  },
+  "l4_vy": {
+    "description": "landmark 4 vy (首幀=0)"
+  },
+  "l4_vz": {
+    "description": "landmark 4 vz (首幀=0)"
+  },
+  "l4_ax": {
+    "description": "landmark 4 ax (首幀=0)"
+  },
+  "l4_ay": {
+    "description": "landmark 4 ay (首幀=0)"
+  },
+  "l4_az": {
+    "description": "landmark 4 az (首幀=0)"
+  },
+  "l5_vx": {
+    "description": "landmark 5 vx (首幀=0)"
+  },
+  "l5_vy": {
+    "description": "landmark 5 vy (首幀=0)"
+  },
+  "l5_vz": {
+    "description": "landmark 5 vz (首幀=0)"
+  },
+  "l5_ax": {
+    "description": "landmark 5 ax (首幀=0)"
+  },
+  "l5_ay": {
+    "description": "landmark 5 ay (首幀=0)"
+  },
+  "l5_az": {
+    "description": "landmark 5 az (首幀=0)"
+  },
+  "l6_vx": {
+    "description": "landmark 6 vx (首幀=0)"
+  },
+  "l6_vy": {
+    "description": "landmark 6 vy (首幀=0)"
+  },
+  "l6_vz": {
+    "description": "landmark 6 vz (首幀=0)"
+  },
+  "l6_ax": {
+    "description": "landmark 6 ax (首幀=0)"
+  },
+  "l6_ay": {
+    "description": "landmark 6 ay (首幀=0)"
+  },
+  "l6_az": {
+    "description": "landmark 6 az (首幀=0)"
+  },
+  "l9_vx": {
+    "description": "landmark 9 vx (首幀=0)"
+  },
+  "l9_vy": {
+    "description": "landmark 9 vy (首幀=0)"
+  },
+  "l9_vz": {
+    "description": "landmark 9 vz (首幀=0)"
+  },
+  "l9_ax": {
+    "description": "landmark 9 ax (首幀=0)"
+  },
+  "l9_ay": {
+    "description": "landmark 9 ay (首幀=0)"
+  },
+  "l9_az": {
+    "description": "landmark 9 az (首幀=0)"
+  },
+  "l10_vx": {
+    "description": "landmark 10 vx (首幀=0)"
+  },
+  "l10_vy": {
+    "description": "landmark 10 vy (首幀=0)"
+  },
+  "l10_vz": {
+    "description": "landmark 10 vz (首幀=0)"
+  },
+  "l10_ax": {
+    "description": "landmark 10 ax (首幀=0)"
+  },
+  "l10_ay": {
+    "description": "landmark 10 ay (首幀=0)"
+  },
+  "l10_az": {
+    "description": "landmark 10 az (首幀=0)"
+  },
+  "l11_vx": {
+    "description": "landmark 11 vx (首幀=0)"
+  },
+  "l11_vy": {
+    "description": "landmark 11 vy (首幀=0)"
+  },
+  "l11_vz": {
+    "description": "landmark 11 vz (首幀=0)"
+  },
+  "l11_ax": {
+    "description": "landmark 11 ax (首幀=0)"
+  },
+  "l11_ay": {
+    "description": "landmark 11 ay (首幀=0)"
+  },
+  "l11_az": {
+    "description": "landmark 11 az (首幀=0)"
+  },
+  "l12_vx": {
+    "description": "landmark 12 vx (首幀=0)"
+  },
+  "l12_vy": {
+    "description": "landmark 12 vy (首幀=0)"
+  },
+  "l12_vz": {
+    "description": "landmark 12 vz (首幀=0)"
+  },
+  "l12_ax": {
+    "description": "landmark 12 ax (首幀=0)"
+  },
+  "l12_ay": {
+    "description": "landmark 12 ay (首幀=0)"
+  },
+  "l12_az": {
+    "description": "landmark 12 az (首幀=0)"
+  },
+  "l13_vx": {
+    "description": "landmark 13 vx (首幀=0)"
+  },
+  "l13_vy": {
+    "description": "landmark 13 vy (首幀=0)"
+  },
+  "l13_vz": {
+    "description": "landmark 13 vz (首幀=0)"
+  },
+  "l13_ax": {
+    "description": "landmark 13 ax (首幀=0)"
+  },
+  "l13_ay": {
+    "description": "landmark 13 ay (首幀=0)"
+  },
+  "l13_az": {
+    "description": "landmark 13 az (首幀=0)"
+  },
+  "l14_vx": {
+    "description": "landmark 14 vx (首幀=0)"
+  },
+  "l14_vy": {
+    "description": "landmark 14 vy (首幀=0)"
+  },
+  "l14_vz": {
+    "description": "landmark 14 vz (首幀=0)"
+  },
+  "l14_ax": {
+    "description": "landmark 14 ax (首幀=0)"
+  },
+  "l14_ay": {
+    "description": "landmark 14 ay (首幀=0)"
+  },
+  "l14_az": {
+    "description": "landmark 14 az (首幀=0)"
+  },
+  "l15_vx": {
+    "description": "landmark 15 vx (首幀=0)"
+  },
+  "l15_vy": {
+    "description": "landmark 15 vy (首幀=0)"
+  },
+  "l15_vz": {
+    "description": "landmark 15 vz (首幀=0)"
+  },
+  "l15_ax": {
+    "description": "landmark 15 ax (首幀=0)"
+  },
+  "l15_ay": {
+    "description": "landmark 15 ay (首幀=0)"
+  },
+  "l15_az": {
+    "description": "landmark 15 az (首幀=0)"
+  },
+  "l16_vx": {
+    "description": "landmark 16 vx (首幀=0)"
+  },
+  "l16_vy": {
+    "description": "landmark 16 vy (首幀=0)"
+  },
+  "l16_vz": {
+    "description": "landmark 16 vz (首幀=0)"
+  },
+  "l16_ax": {
+    "description": "landmark 16 ax (首幀=0)"
+  },
+  "l16_ay": {
+    "description": "landmark 16 ay (首幀=0)"
+  },
+  "l16_az": {
+    "description": "landmark 16 az (首幀=0)"
+  },
+  "l17_vx": {
+    "description": "landmark 17 vx (首幀=0)"
+  },
+  "l17_vy": {
+    "description": "landmark 17 vy (首幀=0)"
+  },
+  "l17_vz": {
+    "description": "landmark 17 vz (首幀=0)"
+  },
+  "l17_ax": {
+    "description": "landmark 17 ax (首幀=0)"
+  },
+  "l17_ay": {
+    "description": "landmark 17 ay (首幀=0)"
+  },
+  "l17_az": {
+    "description": "landmark 17 az (首幀=0)"
+  },
+  "l18_vx": {
+    "description": "landmark 18 vx (首幀=0)"
+  },
+  "l18_vy": {
+    "description": "landmark 18 vy (首幀=0)"
+  },
+  "l18_vz": {
+    "description": "landmark 18 vz (首幀=0)"
+  },
+  "l18_ax": {
+    "description": "landmark 18 ax (首幀=0)"
+  },
+  "l18_ay": {
+    "description": "landmark 18 ay (首幀=0)"
+  },
+  "l18_az": {
+    "description": "landmark 18 az (首幀=0)"
+  },
+  "l19_vx": {
+    "description": "landmark 19 vx (首幀=0)"
+  },
+  "l19_vy": {
+    "description": "landmark 19 vy (首幀=0)"
+  },
+  "l19_vz": {
+    "description": "landmark 19 vz (首幀=0)"
+  },
+  "l19_ax": {
+    "description": "landmark 19 ax (首幀=0)"
+  },
+  "l19_ay": {
+    "description": "landmark 19 ay (首幀=0)"
+  },
+  "l19_az": {
+    "description": "landmark 19 az (首幀=0)"
+  },
+  "l20_vx": {
+    "description": "landmark 20 vx (首幀=0)"
+  },
+  "l20_vy": {
+    "description": "landmark 20 vy (首幀=0)"
+  },
+  "l20_vz": {
+    "description": "landmark 20 vz (首幀=0)"
+  },
+  "l20_ax": {
+    "description": "landmark 20 ax (首幀=0)"
+  },
+  "l20_ay": {
+    "description": "landmark 20 ay (首幀=0)"
+  },
+  "l20_az": {
+    "description": "landmark 20 az (首幀=0)"
+  },
+  "l21_vx": {
+    "description": "landmark 21 vx (首幀=0)"
+  },
+  "l21_vy": {
+    "description": "landmark 21 vy (首幀=0)"
+  },
+  "l21_vz": {
+    "description": "landmark 21 vz (首幀=0)"
+  },
+  "l21_ax": {
+    "description": "landmark 21 ax (首幀=0)"
+  },
+  "l21_ay": {
+    "description": "landmark 21 ay (首幀=0)"
+  },
+  "l21_az": {
+    "description": "landmark 21 az (首幀=0)"
+  },
+  "l22_vx": {
+    "description": "landmark 22 vx (首幀=0)"
+  },
+  "l22_vy": {
+    "description": "landmark 22 vy (首幀=0)"
+  },
+  "l22_vz": {
+    "description": "landmark 22 vz (首幀=0)"
+  },
+  "l22_ax": {
+    "description": "landmark 22 ax (首幀=0)"
+  },
+  "l22_ay": {
+    "description": "landmark 22 ay (首幀=0)"
+  },
+  "l22_az": {
+    "description": "landmark 22 az (首幀=0)"
+  }
+}

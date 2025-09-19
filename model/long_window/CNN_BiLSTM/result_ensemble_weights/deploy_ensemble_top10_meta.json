@@ -1,0 +1,57 @@
+{
+  "selected_seeds": [
+    9,
+    46,
+    39,
+    49,
+    29,
+    37,
+    40,
+    5,
+    33,
+    17
+  ],
+  "saved_probs": "/home/user/projects/train/model/long_window/CNN_BiLSTM/result_ensemble_weights/ensemble_top10_probs.npy",
+  "saved_preds_0.5": "/home/user/projects/train/model/long_window/CNN_BiLSTM/result_ensemble_weights/ensemble_top10_preds_0.5.npy",
+  "metrics_at_0.5": {
+    "auc": 0.7397538363171356,
+    "f1": 0.6933333333333334,
+    "recall": 0.7065217391304348,
+    "precision": 0.680628272251309
+  },
+  "threshold_suggestions": {
+    "threshold_max_precision_aware": {
+      "threshold": 0.52,
+      "precision": 0.6956521739130435,
+      "recall": 0.6956521739130435,
+      "f1": 0.6956521739130435,
+      "precision_aware": 0.7044725063938619
+    },
+    "threshold_max_f1": {
+      "threshold": 0.34,
+      "precision": 0.6199261992619927,
+      "recall": 0.9130434782608695,
+      "f1": 0.7384615384615385,
+      "precision_aware": 0.679452328432885
+    },
+    "threshold_max_precision_with_rec>=0.7": {
+      "threshold": 0.51,
+      "precision": 0.6898395721925134,
+      "recall": 0.7010869565217391,
+      "f1": 0.6954177897574124,
+      "precision_aware": 0.7014958902869075
+    }
+  },
+  "temperature_calibration_source": "/home/user/projects/train/train_data/slipce/windows_npz.npz",
+  "temperature_calibration": {
+    "fitted_temperature": 1.0,
+    "calibrated_probs": "/home/user/projects/train/model/long_window/CNN_BiLSTM/result_ensemble_weights/ensemble_top10_probs_calibrated.npy",
+    "calibrated_preds_0.5": "/home/user/projects/train/model/long_window/CNN_BiLSTM/result_ensemble_weights/ensemble_top10_preds_calibrated_1.000.npy",
+    "calibrated_metrics_at_0.5": {
+      "auc": 0.7397538363171356,
+      "f1": 0.6933333333333334,
+      "recall": 0.7065217391304348,
+      "precision": 0.680628272251309
+    }
+  }
+}

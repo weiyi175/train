@@ -1,0 +1,409 @@
+2025-09-18 22:41:44.409132: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-09-18 22:41:44.441744: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-09-18 22:41:44.909723: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-09-18 22:41:45.388881: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.408781: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.408899: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.410060: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.410125: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.410148: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.503943: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.504103: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.504112: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1726] Could not identify NUMA node of platform GPU id 0, defaulting to 0.  Your kernel may not have been built with NUMA support.
+2025-09-18 22:41:45.504137: I tensorflow/compiler/xla/stream_executor/cuda/cuda_gpu_executor.cc:981] could not open file to read NUMA node: /sys/bus/pci/devices/0000:01:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2025-09-18 22:41:45.504164: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1639] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 9517 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 4070 SUPER, pci bus id: 0000:01:00.0, compute capability: 8.9
+[feature_check] OK: train/test feature_list identical (n=36)
+GPU detected: 1 physical, 1 logical -> ['/device:GPU:0']
+Config: batch=64, accumulate_steps=8 -> effective_batch=512
+Loaded (for internal train/val)  (1276, 36, 75) (1276,)
+Loaded EXTERNAL TEST: (354, 36, 75) from /home/user/projects/train/test_data/slipce/windows_npz.npz
+[mask] windows_npz.npz using occlusion_flag ch=7
+[mask] windows_npz.npz using occlusion_flag ch=7
+Model: "cnn_bilstm_attn_masked"
+__________________________________________________________________________________________________
+ Layer (type)                Output Shape                 Param #   Connected to                  
+==================================================================================================
+ input (InputLayer)          [(None, 36, 75)]             0         []                            
+                                                                                                  
+ permute_time_features (Per  (None, 75, 36)               0         ['input[0][0]']               
+ mute)                                                                                            
+                                                                                                  
+ conv0 (Conv1D)              (None, 75, 64)               6976      ['permute_time_features[0][0]'
+                                                                    ]                             
+                                                                                                  
+ bn0 (BatchNormalization)    (None, 75, 64)               256       ['conv0[0][0]']               
+                                                                                                  
+ act0 (Activation)           (None, 75, 64)               0         ['bn0[0][0]']                 
+                                                                                                  
+ conv_dropout0 (Dropout)     (None, 75, 64)               0         ['act0[0][0]']                
+                                                                                                  
+ conv1 (Conv1D)              (None, 75, 64)               20544     ['conv_dropout0[0][0]']       
+                                                                                                  
+ bn1 (BatchNormalization)    (None, 75, 64)               256       ['conv1[0][0]']               
+                                                                                                  
+ act1 (Activation)           (None, 75, 64)               0         ['bn1[0][0]']                 
+                                                                                                  
+ conv_dropout1 (Dropout)     (None, 75, 64)               0         ['act1[0][0]']                
+                                                                                                  
+ conv2 (Conv1D)              (None, 75, 64)               12352     ['conv_dropout1[0][0]']       
+                                                                                                  
+ bn2 (BatchNormalization)    (None, 75, 64)               256       ['conv2[0][0]']               
+                                                                                                  
+ act2 (Activation)           (None, 75, 64)               0         ['bn2[0][0]']                 
+                                                                                                  
+ conv_dropout2 (Dropout)     (None, 75, 64)               0         ['act2[0][0]']                
+                                                                                                  
+ bilstm (Bidirectional)      (None, 75, 128)              66048     ['conv_dropout2[0][0]']       
+                                                                                                  
+ mlp_attn_u (Dense)          (None, 75, 32)               4128      ['bilstm[0][0]']              
+                                                                                                  
+ mlp_attn_score (Dense)      (None, 75, 1)                33        ['mlp_attn_u[0][0]']          
+                                                                                                  
+ mlp_attn_squeeze (Lambda)   (None, 75)                   0         ['mlp_attn_score[0][0]']      
+                                                                                                  
+ attn_mask (InputLayer)      [(None, 75)]                 0         []                            
+                                                                                                  
+ mlp_attn_apply_mask (Lambd  (None, 75)                   0         ['mlp_attn_squeeze[0][0]',    
+ a)                                                                  'attn_mask[0][0]']           
+                                                                                                  
+ mlp_attn_softmax (Lambda)   (None, 75)                   0         ['mlp_attn_apply_mask[0][0]'] 
+                                                                                                  
+ mlp_attn_expand (Lambda)    (None, 75, 1)                0         ['mlp_attn_softmax[0][0]']    
+                                                                                                  
+ mlp_attn_weighted (Lambda)  (None, 128)                  0         ['bilstm[0][0]',              
+                                                                     'mlp_attn_expand[0][0]']     
+                                                                                                  
+ fc1 (Dense)                 (None, 64)                   8256      ['mlp_attn_weighted[0][0]']   
+                                                                                                  
+ fc_dropout (Dropout)        (None, 64)                   0         ['fc1[0][0]']                 
+                                                                                                  
+ out (Dense)                 (None, 1)                    65        ['fc_dropout[0][0]']          
+                                                                                                  
+==================================================================================================
+Total params: 119171 (465.51 KB)
+Trainable params: 118786 (464.01 KB)
+Non-trainable params: 385 (1.50 KB)
+__________________________________________________________________________________________________
+None
+Writing results to result_ensemble_weights/seed44/01
+Curriculum: set focal gamma = 0.0000 (epoch 1)
+Epoch 1/60
+2025-09-18 22:41:51.495203: I tensorflow/compiler/xla/stream_executor/cuda/cuda_dnn.cc:432] Loaded cuDNN version 8600
+2025-09-18 22:41:51.641595: I tensorflow/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2025-09-18 22:41:51.899626: I tensorflow/compiler/xla/stream_executor/cuda/cuda_blas.cc:606] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+2025-09-18 22:41:52.533430: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x70566027f420 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2025-09-18 22:41:52.533492: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): NVIDIA GeForce RTX 4070 SUPER, Compute Capability 8.9
+2025-09-18 22:41:52.537164: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:255] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+2025-09-18 22:41:52.590007: I tensorflow/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2025-09-18 22:41:52.627511: I ./tensorflow/compiler/jit/device_compiler.h:186] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 8s - loss: 0.3632 - auc: 0.4907 - val_loss: 0.3476 - val_auc: 0.5107 - val_auc_custom: 0.5172 - val_f1_custom: 0.5833 - val_recall_custom: 0.9245 - val_composite: 0.7407 - val_precision_aware: 0.4915 - 8s/epoch - 589ms/step
+Curriculum: set focal gamma = 0.0526 (epoch 2)
+Epoch 2/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.3425 - auc: 0.5259 - val_loss: 0.3296 - val_auc: 0.5738 - val_auc_custom: 0.5771 - val_f1_custom: 0.0714 - val_recall_custom: 0.0377 - val_composite: 0.1557 - val_precision_aware: 0.4702 - 753ms/epoch - 54ms/step
+Curriculum: set focal gamma = 0.1053 (epoch 3)
+Epoch 3/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.3236 - auc: 0.5664 - val_loss: 0.3139 - val_auc: 0.5894 - val_auc_custom: 0.5799 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - val_composite: 0.1160 - val_precision_aware: 0.1160 - 729ms/epoch - 52ms/step
+Curriculum: set focal gamma = 0.1579 (epoch 4)
+Epoch 4/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.3091 - auc: 0.5642 - val_loss: 0.3004 - val_auc: 0.5857 - val_auc_custom: 0.5857 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - val_composite: 0.1171 - val_precision_aware: 0.1171 - 800ms/epoch - 57ms/step
+Curriculum: set focal gamma = 0.2105 (epoch 5)
+Epoch 5/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2949 - auc: 0.6096 - val_loss: 0.2887 - val_auc: 0.5907 - val_auc_custom: 0.5892 - val_f1_custom: 0.0000e+00 - val_recall_custom: 0.0000e+00 - val_composite: 0.1178 - val_precision_aware: 0.1178 - 879ms/epoch - 63ms/step
+Curriculum: set focal gamma = 0.2632 (epoch 6)
+Epoch 6/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2847 - auc: 0.5923 - val_loss: 0.2769 - val_auc: 0.6008 - val_auc_custom: 0.6020 - val_f1_custom: 0.0370 - val_recall_custom: 0.0189 - val_composite: 0.1409 - val_precision_aware: 0.6315 - 810ms/epoch - 58ms/step
+Curriculum: set focal gamma = 0.3158 (epoch 7)
+Epoch 7/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2700 - auc: 0.6425 - val_loss: 0.2653 - val_auc: 0.6114 - val_auc_custom: 0.6118 - val_f1_custom: 0.1053 - val_recall_custom: 0.0566 - val_composite: 0.1822 - val_precision_aware: 0.5289 - 727ms/epoch - 52ms/step
+Curriculum: set focal gamma = 0.3684 (epoch 8)
+Epoch 8/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2607 - auc: 0.6259 - val_loss: 0.2541 - val_auc: 0.6097 - val_auc_custom: 0.6121 - val_f1_custom: 0.1311 - val_recall_custom: 0.0755 - val_composite: 0.1995 - val_precision_aware: 0.4118 - 733ms/epoch - 52ms/step
+Curriculum: set focal gamma = 0.4211 (epoch 9)
+Epoch 9/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2493 - auc: 0.6388 - val_loss: 0.2443 - val_auc: 0.6122 - val_auc_custom: 0.6128 - val_f1_custom: 0.1875 - val_recall_custom: 0.1132 - val_composite: 0.2354 - val_precision_aware: 0.4515 - 1s/epoch - 72ms/step
+Curriculum: set focal gamma = 0.4737 (epoch 10)
+Epoch 10/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2393 - auc: 0.6389 - val_loss: 0.2343 - val_auc: 0.6171 - val_auc_custom: 0.6189 - val_f1_custom: 0.2319 - val_recall_custom: 0.1509 - val_composite: 0.2688 - val_precision_aware: 0.4433 - 882ms/epoch - 63ms/step
+Curriculum: set focal gamma = 0.5263 (epoch 11)
+Epoch 11/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2286 - auc: 0.6554 - val_loss: 0.2253 - val_auc: 0.6258 - val_auc_custom: 0.6257 - val_f1_custom: 0.2750 - val_recall_custom: 0.2075 - val_composite: 0.3114 - val_precision_aware: 0.4113 - 987ms/epoch - 70ms/step
+Curriculum: set focal gamma = 0.5789 (epoch 12)
+Epoch 12/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 0s - loss: 0.2211 - auc: 0.6517 - val_loss: 0.2169 - val_auc: 0.6306 - val_auc_custom: 0.6287 - val_f1_custom: 0.3864 - val_recall_custom: 0.3208 - val_composite: 0.4020 - val_precision_aware: 0.4845 - 251ms/epoch - 18ms/step
+Curriculum: set focal gamma = 0.6316 (epoch 13)
+Epoch 13/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2102 - auc: 0.6683 - val_loss: 0.2093 - val_auc: 0.6269 - val_auc_custom: 0.6279 - val_f1_custom: 0.3778 - val_recall_custom: 0.3208 - val_composite: 0.3993 - val_precision_aware: 0.4686 - 792ms/epoch - 57ms/step
+Curriculum: set focal gamma = 0.6842 (epoch 14)
+Epoch 14/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.2056 - auc: 0.6505 - val_loss: 0.2021 - val_auc: 0.6233 - val_auc_custom: 0.6239 - val_f1_custom: 0.3913 - val_recall_custom: 0.3396 - val_composite: 0.4120 - val_precision_aware: 0.4729 - 815ms/epoch - 58ms/step
+Curriculum: set focal gamma = 0.7368 (epoch 15)
+Epoch 15/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1966 - auc: 0.6645 - val_loss: 0.1953 - val_auc: 0.6203 - val_auc_custom: 0.6209 - val_f1_custom: 0.3596 - val_recall_custom: 0.3019 - val_composite: 0.3830 - val_precision_aware: 0.4543 - 791ms/epoch - 56ms/step
+Curriculum: set focal gamma = 0.7895 (epoch 16)
+Epoch 16/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1881 - auc: 0.6727 - val_loss: 0.1887 - val_auc: 0.6211 - val_auc_custom: 0.6224 - val_f1_custom: 0.3596 - val_recall_custom: 0.3019 - val_composite: 0.3833 - val_precision_aware: 0.4546 - 1s/epoch - 71ms/step
+Curriculum: set focal gamma = 0.8421 (epoch 17)
+Epoch 17/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1839 - auc: 0.6586 - val_loss: 0.1824 - val_auc: 0.6190 - val_auc_custom: 0.6186 - val_f1_custom: 0.3636 - val_recall_custom: 0.3019 - val_composite: 0.3838 - val_precision_aware: 0.4614 - 967ms/epoch - 69ms/step
+Curriculum: set focal gamma = 0.8947 (epoch 18)
+Epoch 18/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1751 - auc: 0.6750 - val_loss: 0.1760 - val_auc: 0.6179 - val_auc_custom: 0.6179 - val_f1_custom: 0.3529 - val_recall_custom: 0.2830 - val_composite: 0.3710 - val_precision_aware: 0.4638 - 801ms/epoch - 57ms/step
+Curriculum: set focal gamma = 0.9474 (epoch 19)
+Epoch 19/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1682 - auc: 0.6752 - val_loss: 0.1695 - val_auc: 0.6140 - val_auc_custom: 0.6131 - val_f1_custom: 0.3571 - val_recall_custom: 0.2830 - val_composite: 0.3713 - val_precision_aware: 0.4717 - 838ms/epoch - 60ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 20)
+Epoch 20/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1603 - auc: 0.6875 - val_loss: 0.1631 - val_auc: 0.6190 - val_auc_custom: 0.6166 - val_f1_custom: 0.3571 - val_recall_custom: 0.2830 - val_composite: 0.3720 - val_precision_aware: 0.4724 - 965ms/epoch - 69ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 21)
+Epoch 21/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1599 - auc: 0.6908 - val_loss: 0.1629 - val_auc: 0.6184 - val_auc_custom: 0.6174 - val_f1_custom: 0.3571 - val_recall_custom: 0.2830 - val_composite: 0.3721 - val_precision_aware: 0.4726 - 716ms/epoch - 51ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 22)
+Epoch 22/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1599 - auc: 0.6882 - val_loss: 0.1624 - val_auc: 0.6186 - val_auc_custom: 0.6199 - val_f1_custom: 0.3765 - val_recall_custom: 0.3019 - val_composite: 0.3879 - val_precision_aware: 0.4869 - 797ms/epoch - 57ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 23)
+Epoch 23/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1580 - auc: 0.7028 - val_loss: 0.1620 - val_auc: 0.6229 - val_auc_custom: 0.6214 - val_f1_custom: 0.3721 - val_recall_custom: 0.3019 - val_composite: 0.3868 - val_precision_aware: 0.4783 - 910ms/epoch - 65ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 24)
+Epoch 24/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1589 - auc: 0.6955 - val_loss: 0.1619 - val_auc: 0.6197 - val_auc_custom: 0.6219 - val_f1_custom: 0.3488 - val_recall_custom: 0.2830 - val_composite: 0.3705 - val_precision_aware: 0.4563 - 702ms/epoch - 50ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 25)
+Epoch 25/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1582 - auc: 0.7033 - val_loss: 0.1619 - val_auc: 0.6221 - val_auc_custom: 0.6209 - val_f1_custom: 0.3488 - val_recall_custom: 0.2830 - val_composite: 0.3703 - val_precision_aware: 0.4561 - 876ms/epoch - 63ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 26)
+Epoch 26/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1565 - auc: 0.7176 - val_loss: 0.1619 - val_auc: 0.6220 - val_auc_custom: 0.6229 - val_f1_custom: 0.3678 - val_recall_custom: 0.3019 - val_composite: 0.3859 - val_precision_aware: 0.4702 - 753ms/epoch - 54ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 27)
+Epoch 27/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1576 - auc: 0.7071 - val_loss: 0.1620 - val_auc: 0.6184 - val_auc_custom: 0.6221 - val_f1_custom: 0.3678 - val_recall_custom: 0.3019 - val_composite: 0.3857 - val_precision_aware: 0.4701 - 751ms/epoch - 54ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 28)
+Epoch 28/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1565 - auc: 0.7161 - val_loss: 0.1622 - val_auc: 0.6229 - val_auc_custom: 0.6209 - val_f1_custom: 0.3820 - val_recall_custom: 0.3208 - val_composite: 0.3992 - val_precision_aware: 0.4749 - 879ms/epoch - 63ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 29)
+Epoch 29/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1563 - auc: 0.7179 - val_loss: 0.1624 - val_auc: 0.6223 - val_auc_custom: 0.6234 - val_f1_custom: 0.3820 - val_recall_custom: 0.3208 - val_composite: 0.3997 - val_precision_aware: 0.4754 - 769ms/epoch - 55ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 30)
+Epoch 30/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1557 - auc: 0.7119 - val_loss: 0.1626 - val_auc: 0.6219 - val_auc_custom: 0.6226 - val_f1_custom: 0.4000 - val_recall_custom: 0.3396 - val_composite: 0.4143 - val_precision_aware: 0.4878 - 759ms/epoch - 54ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 31)
+Epoch 31/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1568 - auc: 0.7114 - val_loss: 0.1629 - val_auc: 0.6264 - val_auc_custom: 0.6247 - val_f1_custom: 0.3871 - val_recall_custom: 0.3396 - val_composite: 0.4109 - val_precision_aware: 0.4661 - 798ms/epoch - 57ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 32)
+Epoch 32/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1549 - auc: 0.7215 - val_loss: 0.1633 - val_auc: 0.6274 - val_auc_custom: 0.6284 - val_f1_custom: 0.4444 - val_recall_custom: 0.4151 - val_composite: 0.4666 - val_precision_aware: 0.4981 - 804ms/epoch - 57ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 33)
+Epoch 33/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1532 - auc: 0.7333 - val_loss: 0.1634 - val_auc: 0.6291 - val_auc_custom: 0.6292 - val_f1_custom: 0.4444 - val_recall_custom: 0.4151 - val_composite: 0.4667 - val_precision_aware: 0.4983 - 738ms/epoch - 53ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 34)
+Epoch 34/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1530 - auc: 0.7370 - val_loss: 0.1635 - val_auc: 0.6313 - val_auc_custom: 0.6297 - val_f1_custom: 0.4554 - val_recall_custom: 0.4340 - val_composite: 0.4796 - val_precision_aware: 0.5022 - 730ms/epoch - 52ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 35)
+Epoch 35/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1514 - auc: 0.7421 - val_loss: 0.1644 - val_auc: 0.6299 - val_auc_custom: 0.6312 - val_f1_custom: 0.4808 - val_recall_custom: 0.4717 - val_composite: 0.5063 - val_precision_aware: 0.5156 - 805ms/epoch - 57ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 36)
+Epoch 36/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1512 - auc: 0.7444 - val_loss: 0.1650 - val_auc: 0.6303 - val_auc_custom: 0.6304 - val_f1_custom: 0.4808 - val_recall_custom: 0.4717 - val_composite: 0.5062 - val_precision_aware: 0.5154 - 660ms/epoch - 47ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 37)
+Epoch 37/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1499 - auc: 0.7566 - val_loss: 0.1651 - val_auc: 0.6288 - val_auc_custom: 0.6279 - val_f1_custom: 0.4854 - val_recall_custom: 0.4717 - val_composite: 0.5071 - val_precision_aware: 0.5212 - 913ms/epoch - 65ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 38)
+Epoch 38/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1491 - auc: 0.7576 - val_loss: 0.1648 - val_auc: 0.6336 - val_auc_custom: 0.6327 - val_f1_custom: 0.4952 - val_recall_custom: 0.4906 - val_composite: 0.5204 - val_precision_aware: 0.5251 - 846ms/epoch - 60ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 39)
+Epoch 39/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1499 - auc: 0.7557 - val_loss: 0.1644 - val_auc: 0.6338 - val_auc_custom: 0.6350 - val_f1_custom: 0.4906 - val_recall_custom: 0.4906 - val_composite: 0.5194 - val_precision_aware: 0.5194 - 811ms/epoch - 58ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 40)
+Epoch 40/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1466 - auc: 0.7712 - val_loss: 0.1649 - val_auc: 0.6364 - val_auc_custom: 0.6362 - val_f1_custom: 0.5138 - val_recall_custom: 0.5283 - val_composite: 0.5455 - val_precision_aware: 0.5314 - 783ms/epoch - 56ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 41)
+Epoch 41/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1442 - auc: 0.7815 - val_loss: 0.1649 - val_auc: 0.6348 - val_auc_custom: 0.6370 - val_f1_custom: 0.5138 - val_recall_custom: 0.5283 - val_composite: 0.5457 - val_precision_aware: 0.5315 - 850ms/epoch - 61ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 42)
+Epoch 42/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1437 - auc: 0.7800 - val_loss: 0.1657 - val_auc: 0.6381 - val_auc_custom: 0.6367 - val_f1_custom: 0.5138 - val_recall_custom: 0.5283 - val_composite: 0.5456 - val_precision_aware: 0.5315 - 864ms/epoch - 62ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 43)
+Epoch 43/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1448 - auc: 0.7764 - val_loss: 0.1673 - val_auc: 0.6323 - val_auc_custom: 0.6327 - val_f1_custom: 0.5487 - val_recall_custom: 0.5849 - val_composite: 0.5836 - val_precision_aware: 0.5495 - 726ms/epoch - 52ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 44)
+Epoch 44/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1409 - auc: 0.7882 - val_loss: 0.1685 - val_auc: 0.6333 - val_auc_custom: 0.6347 - val_f1_custom: 0.5487 - val_recall_custom: 0.5849 - val_composite: 0.5840 - val_precision_aware: 0.5499 - 851ms/epoch - 61ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 45)
+Epoch 45/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1400 - auc: 0.7949 - val_loss: 0.1681 - val_auc: 0.6369 - val_auc_custom: 0.6382 - val_f1_custom: 0.5586 - val_recall_custom: 0.5849 - val_composite: 0.5877 - val_precision_aware: 0.5625 - 726ms/epoch - 52ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 46)
+Epoch 46/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1391 - auc: 0.8001 - val_loss: 0.1693 - val_auc: 0.6424 - val_auc_custom: 0.6413 - val_f1_custom: 0.5812 - val_recall_custom: 0.6415 - val_composite: 0.6234 - val_precision_aware: 0.5682 - 855ms/epoch - 61ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 47)
+Epoch 47/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1392 - auc: 0.7979 - val_loss: 0.1700 - val_auc: 0.6448 - val_auc_custom: 0.6453 - val_f1_custom: 0.5882 - val_recall_custom: 0.6604 - val_composite: 0.6357 - val_precision_aware: 0.5707 - 808ms/epoch - 58ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 48)
+Epoch 48/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1374 - auc: 0.8027 - val_loss: 0.1682 - val_auc: 0.6614 - val_auc_custom: 0.6609 - val_f1_custom: 0.5763 - val_recall_custom: 0.6415 - val_composite: 0.6258 - val_precision_aware: 0.5666 - 816ms/epoch - 58ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 49)
+Epoch 49/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1384 - auc: 0.8005 - val_loss: 0.1688 - val_auc: 0.6644 - val_auc_custom: 0.6647 - val_f1_custom: 0.5882 - val_recall_custom: 0.6604 - val_composite: 0.6396 - val_precision_aware: 0.5746 - 826ms/epoch - 59ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 50)
+Epoch 50/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1351 - auc: 0.8143 - val_loss: 0.1695 - val_auc: 0.6702 - val_auc_custom: 0.6699 - val_f1_custom: 0.5833 - val_recall_custom: 0.6604 - val_composite: 0.6392 - val_precision_aware: 0.5702 - 807ms/epoch - 58ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 51)
+Epoch 51/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 0s - loss: 0.1322 - auc: 0.8217 - val_loss: 0.1704 - val_auc: 0.6660 - val_auc_custom: 0.6674 - val_f1_custom: 0.5882 - val_recall_custom: 0.6604 - val_composite: 0.6401 - val_precision_aware: 0.5751 - 229ms/epoch - 16ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 52)
+Epoch 52/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1306 - auc: 0.8269 - val_loss: 0.1697 - val_auc: 0.6709 - val_auc_custom: 0.6704 - val_f1_custom: 0.6000 - val_recall_custom: 0.6792 - val_composite: 0.6537 - val_precision_aware: 0.5827 - 758ms/epoch - 54ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 53)
+Epoch 53/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1353 - auc: 0.8111 - val_loss: 0.1687 - val_auc: 0.6781 - val_auc_custom: 0.6782 - val_f1_custom: 0.6000 - val_recall_custom: 0.6792 - val_composite: 0.6553 - val_precision_aware: 0.5843 - 693ms/epoch - 49ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 54)
+Epoch 54/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1307 - auc: 0.8257 - val_loss: 0.1735 - val_auc: 0.6733 - val_auc_custom: 0.6737 - val_f1_custom: 0.6080 - val_recall_custom: 0.7170 - val_composite: 0.6756 - val_precision_aware: 0.5810 - 816ms/epoch - 58ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 55)
+Epoch 55/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1292 - auc: 0.8279 - val_loss: 0.1781 - val_auc: 0.6697 - val_auc_custom: 0.6702 - val_f1_custom: 0.6202 - val_recall_custom: 0.7547 - val_composite: 0.6974 - val_precision_aware: 0.5832 - 818ms/epoch - 58ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 56)
+Epoch 56/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1261 - auc: 0.8405 - val_loss: 0.1715 - val_auc: 0.6844 - val_auc_custom: 0.6840 - val_f1_custom: 0.6080 - val_recall_custom: 0.7170 - val_composite: 0.6777 - val_precision_aware: 0.5831 - 789ms/epoch - 56ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 57)
+Epoch 57/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1278 - auc: 0.8376 - val_loss: 0.1663 - val_auc: 0.6966 - val_auc_custom: 0.6964 - val_f1_custom: 0.6154 - val_recall_custom: 0.6792 - val_composite: 0.6635 - val_precision_aware: 0.6051 - 602ms/epoch - 43ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 58)
+Epoch 58/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1220 - auc: 0.8516 - val_loss: 0.1647 - val_auc: 0.7053 - val_auc_custom: 0.7064 - val_f1_custom: 0.6154 - val_recall_custom: 0.6792 - val_composite: 0.6655 - val_precision_aware: 0.6071 - 687ms/epoch - 49ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 59)
+Epoch 59/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 1s - loss: 0.1217 - auc: 0.8502 - val_loss: 0.1752 - val_auc: 0.6992 - val_auc_custom: 0.6986 - val_f1_custom: 0.6400 - val_recall_custom: 0.7547 - val_composite: 0.7091 - val_precision_aware: 0.6095 - 584ms/epoch - 42ms/step
+Curriculum: set focal gamma = 1.0000 (epoch 60)
+Epoch 60/60
+WARNING:tensorflow:Can save best model only with val_precision_aware available, skipping.
+WARNING:tensorflow:Early stopping conditioned on metric `val_precision_aware` which is not available. Available metrics are: loss,auc,val_loss,val_auc
+14/14 - 0s - loss: 0.1164 - auc: 0.8687 - val_loss: 0.1780 - val_auc: 0.6992 - val_auc_custom: 0.6991 - val_f1_custom: 0.6250 - val_recall_custom: 0.7547 - val_composite: 0.7047 - val_precision_aware: 0.5940 - 386ms/epoch - 28ms/step
+Saved final weights to result_ensemble_weights/seed44/01/final.weights
+Mask config -> mode=soft, threshold=0.7, window_gate=None
+Done. Results saved to result_ensemble_weights/seed44/01
