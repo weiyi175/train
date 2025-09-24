@@ -1,0 +1,10 @@
+{
+  "total_windows": 236,
+  "smoke_windows": 141,
+  "no_smoke_windows": 95,
+  "smoke_ratio_thresh": 0.5,
+  "win_size": 30,
+  "stride": 30,
+  "norm_type": "per_window",
+  "feature_count": 36
+}

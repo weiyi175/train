@@ -1,0 +1,44 @@
+{
+  "ensemble_config": {
+    "k": 10,
+    "metric": "composite",
+    "total_models": 10,
+    "selected_seeds": [
+      3,
+      2,
+      8,
+      5,
+      7,
+      4,
+      9,
+      10,
+      6,
+      1
+    ]
+  },
+  "ensemble_metrics": {
+    "auc": 0.7343510230179028,
+    "f1": 0.7277227722772277,
+    "recall": 0.7989130434782609,
+    "precision": 0.6681818181818182,
+    "composite": 0.7646435580258794,
+    "precision_aware": 0.699277945377658,
+    "confusion_matrix": {
+      "tp": 147,
+      "fp": 73,
+      "fn": 37,
+      "tn": 97
+    }
+  },
+  "best_individual": {
+    "seed": 3,
+    "auc": 0.699024936061381,
+    "f1": 0.7351598173515982,
+    "precision_aware": 0.6772820662760234
+  },
+  "improvements": {
+    "auc": 0.03532608695652173,
+    "f1": -0.007437045074370485,
+    "precision_aware": 0.021995879101634586
+  }
+}

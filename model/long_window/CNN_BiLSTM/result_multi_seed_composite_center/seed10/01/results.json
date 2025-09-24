@@ -1,0 +1,140 @@
+{
+  "test": {
+    "auc": 0.6989609974424552,
+    "f1": 0.5466666666666666,
+    "recall": 0.44565217391304346,
+    "precision": 0.7068965517241379,
+    "composite": 0.5266182864450127,
+    "precision_aware": 0.65724047535056,
+    "TP": 82,
+    "FP": 34,
+    "FN": 102,
+    "TN": 136
+  },
+  "top_epochs": [
+    {
+      "epoch": 50,
+      "auc": 0.7682682682682682,
+      "f1": 0.6942148760330579,
+      "recall": 0.7777777777777778,
+      "precision": 0.6268656716417911,
+      "score": 0.7508070053524599,
+      "precision_aware": 0.6753509522844666,
+      "TP": 42,
+      "FP": 25,
+      "FN": 12,
+      "TN": 49
+    },
+    {
+      "epoch": 42,
+      "auc": 0.7642642642642642,
+      "f1": 0.6972477064220184,
+      "recall": 0.7037037037037037,
+      "precision": 0.6909090909090909,
+      "score": 0.7138790166313103,
+      "precision_aware": 0.7074817102340039,
+      "TP": 38,
+      "FP": 17,
+      "FN": 16,
+      "TN": 57
+    },
+    {
+      "epoch": 27,
+      "auc": 0.7952952952952952,
+      "f1": 0.72,
+      "recall": 0.6666666666666666,
+      "precision": 0.782608695652174,
+      "score": 0.7083923923923924,
+      "precision_aware": 0.766363406885146,
+      "TP": 36,
+      "FP": 10,
+      "FN": 18,
+      "TN": 64
+    },
+    {
+      "epoch": 25,
+      "auc": 0.7975475475475475,
+      "f1": 0.7058823529411765,
+      "recall": 0.6666666666666666,
+      "precision": 0.75,
+      "score": 0.7046075487251957,
+      "precision_aware": 0.7462742153918624,
+      "TP": 36,
+      "FP": 12,
+      "FN": 18,
+      "TN": 62
+    }
+  ],
+  "top_epochs_precision_aware": [
+    {
+      "epoch": 27,
+      "auc": 0.7952952952952952,
+      "f1": 0.72,
+      "recall": 0.6666666666666666,
+      "precision": 0.782608695652174,
+      "score": 0.7083923923923924,
+      "precision_aware": 0.766363406885146,
+      "TP": 36,
+      "FP": 10,
+      "FN": 18,
+      "TN": 64
+    },
+    {
+      "epoch": 26,
+      "auc": 0.7760260260260261,
+      "f1": 0.627906976744186,
+      "recall": 0.5,
+      "precision": 0.84375,
+      "score": 0.5935772982284611,
+      "precision_aware": 0.765452298228461,
+      "TP": 27,
+      "FP": 5,
+      "FN": 27,
+      "TN": 69
+    },
+    {
+      "epoch": 28,
+      "auc": 0.7695195195195195,
+      "f1": 0.72,
+      "recall": 0.6666666666666666,
+      "precision": 0.782608695652174,
+      "score": 0.7032372372372373,
+      "precision_aware": 0.761208251729991,
+      "TP": 36,
+      "FP": 10,
+      "FN": 18,
+      "TN": 64
+    },
+    {
+      "epoch": 25,
+      "auc": 0.7975475475475475,
+      "f1": 0.7058823529411765,
+      "recall": 0.6666666666666666,
+      "precision": 0.75,
+      "score": 0.7046075487251957,
+      "precision_aware": 0.7462742153918624,
+      "TP": 36,
+      "FP": 12,
+      "FN": 18,
+      "TN": 62
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 16,
+    "accumulate_steps": 8,
+    "effective_batch": 128,
+    "run_seed": 10,
+    "focal_alpha": 0.4,
+    "focal_gamma_start": 0.0,
+    "focal_gamma_end": 1.0,
+    "curriculum_epochs": 20,
+    "class_weight_neg": 1.05,
+    "class_weight_pos": 0.8,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": null,
+    "checkpoint_metric": "composite"
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce_center/windows_npz.npz --val_windows None --test_windows /home/user/projects/train/test_data/slipce/windows_npz.npz --epochs 70 --batch 16 --accumulate_steps 8 --result_dir result_multi_seed_composite_center/seed10 --focal_alpha 0.4 --focal_gamma_start 0.0 --focal_gamma_end 1.0 --curriculum_epochs 20 --run_seed 10 --checkpoint_metric composite --class_weight_neg 1.05 --class_weight_pos 0.8 --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean None  [auto-mask: occlusion_flag]"
+}

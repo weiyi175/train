@@ -1,7 +1,7 @@
 import os
 import argparse
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import roc_auc_score, f1_score, recall_score, confusion_matrix
 import tensorflow as tf
 
@@ -218,11 +218,15 @@ class CurriculumCallback(tf.keras.callbacks.Callback):
         print(f'Curriculum: set focal gamma = {new_gamma:.4f} (epoch {epoch + 1})')
 
 
-def parse_args():
+def parse_args(argv: list | None = None):
     p = argparse.ArgumentParser()
-    p.add_argument('--windows', default='/home/user/projects/train/train_data/slipce/windows_npz.npz')
-    p.add_argument('--val_windows', default=None, help='Optional separate validation set NPZ (if provided, disable internal split)')
-    p.add_argument('--test_windows', default='/home/user/projects/train/test_data/slipce/windows_npz.npz', help='Optional separate test set NPZ. If provided alone (without --val_windows), internal split provides train/val and this file is used purely as external test. Default set to test_data/slipce/windows_npz.npz')
+    p.add_argument('--windows', default='/home/user/projects/train/train_data/slipce_thresh040/windows_npz.npz')
+    p.add_argument('--val_windows', default='/home/user/projects/train/Val_data/slipce_thresh040/windows_npz.npz', help='Optional separate validation set NPZ (if provided, disable internal split). Default set to Val_data/slipce_thresh040/windows_npz.npz')
+    p.add_argument('--test_windows', default='/home/user/projects/train/test_data/slipce_thresh040/windows_npz.npz', help='Optional separate test set NPZ. If provided alone (without --val_windows), internal split provides train/val and this file is used purely as external test. Default set to test_data/slipce_thresh040/windows_npz.npz')
+    # K-fold CV controls (when >1, will merge train+val and do stratified k-fold; test kept for final eval)
+    p.add_argument('--kfold', type=int, default=0, help='Stratified K-fold CV splits. 0 or 1 to disable; >=2 to enable (e.g., 5). Requires --val_windows present to merge train+val.')
+    p.add_argument('--kfold_seed', type=int, default=42, help='Random seed for K-fold shuffling')
+    p.add_argument('--final_internal_val_ratio', type=float, default=0.0, help='In final full-data training (after CV), hold out a small ratio for internal val. 0 means no val (no early stop).')
     p.add_argument('--epochs', type=int, default=70)
     p.add_argument('--batch', type=int, default=16)
     p.add_argument('--accumulate_steps', type=int, default=8, help='Accumulate gradients over N steps to simulate larger effective batch')
@@ -241,7 +245,7 @@ def parse_args():
     p.add_argument('--mask_threshold', type=float, default=0.6, help='Attention mask threshold (used by model when use_mask=True)')
     p.add_argument('--mask_mode', choices=['soft', 'hard'], default='soft', help='Mask mode for attention weighting')
     p.add_argument('--window_mask_min_mean', type=float, default=None, help='Window-level gating: only allow positive if mean(mask) >= t')
-    return p.parse_args()
+    return p.parse_args(argv)
 
 
 def main():
@@ -280,21 +284,59 @@ def main():
     print(f'Config: batch={args.batch}, accumulate_steps={args.accumulate_steps} -> effective_batch={_eff_batch}')
 
     def derive_mask(path):
+        """Return mask of shape (N, T) using occlusion_flag channel.
+        Handles both (N,F,T) and (N,T,F). Falls back to *_norm if *_raw missing.
+        """
         try:
             base = np.load(path, allow_pickle=True)
             feat_names = list(base['feature_list'].tolist()) if 'feature_list' in base else None
-            key_raw = 'long_raw' if 'long_raw' in base else ('short_raw' if 'short_raw' in base else None)
-            X_raw = base[key_raw] if key_raw else None
-            if feat_names is not None and 'occlusion_flag' in feat_names and X_raw is not None:
+            F = len(feat_names) if feat_names is not None else None
+
+            # Prefer raw, fallback to norm
+            for key in ('long_raw', 'short_raw', 'long_norm', 'short_norm'):
+                if key in base:
+                    X_any = np.asarray(base[key])
+                    break
+            else:
+                X_any = None
+
+            if X_any is None:
+                return None
+
+            # Decide which axis is the channel axis
+            ch_axis = None
+            if F is not None and X_any.ndim == 3:
+                if X_any.shape[1] == F:
+                    ch_axis = 1  # (N,F,T)
+                elif X_any.shape[2] == F:
+                    ch_axis = 2  # (N,T,F)
+
+            def _take_channel(x, idx, axis):
+                if axis == 1:
+                    return x[:, idx, :]  # (N,T)
+                elif axis == 2:
+                    return x[:, :, idx]  # (N,T)
+                else:
+                    return None
+
+            if feat_names is not None and 'occlusion_flag' in feat_names and ch_axis is not None:
                 ch = feat_names.index('occlusion_flag')
-                m = np.asarray(X_raw)[:, ch, :]
-                mt = np.clip(m, 0.0, 1.0).astype(np.float32)
-                print(f'[mask] {os.path.basename(path)} using occlusion_flag ch={ch}')
-                return mt
-            elif X_raw is not None:
-                mt = np.clip(np.asarray(X_raw)[:, -1, :], 0.0, 1.0).astype(np.float32)
-                print(f'[mask] {os.path.basename(path)} using last raw channel (fallback)')
-                return mt
+                m = _take_channel(X_any, ch, ch_axis)
+                if m is not None:
+                    mt = np.clip(m, 0.0, 1.0).astype(np.float32)
+                    axis_note = '(N,F,T)' if ch_axis == 1 else '(N,T,F)'
+                    print(f'[mask] {os.path.basename(path)} using occlusion_flag ch={ch} axis={axis_note}')
+                    return mt
+
+            # Fallback: last channel along detected channel axis
+            if ch_axis is not None:
+                last_idx = X_any.shape[ch_axis] - 1
+                m = _take_channel(X_any, last_idx, ch_axis)
+                if m is not None:
+                    mt = np.clip(m, 0.0, 1.0).astype(np.float32)
+                    axis_note = '(N,F,T)' if ch_axis == 1 else '(N,T,F)'
+                    print(f'[mask] {os.path.basename(path)} using last channel fallback axis={axis_note}')
+                    return mt
         except Exception as e:
             print('[mask] derive failed for', path, '->', e)
         return None
@@ -303,6 +345,451 @@ def main():
     MASK_THRESHOLD = float(args.mask_threshold)
     external_val = args.val_windows is not None
     external_test_only = (args.val_windows is None and args.test_windows is not None)
+
+    # ----------------------
+    # K-FOLD CV MODE (merge train+val, keep test for final)
+    # ----------------------
+    if isinstance(args.kfold, int) and args.kfold and args.kfold > 1:
+        if not external_val:
+            print('[kfold] ERROR: --kfold enabled but --val_windows not provided. K-fold mode requires separate val NPZ to merge with train.')
+            return
+        k = int(args.kfold)
+        print(f'[kfold] Enabled: Stratified {k}-fold. Merge TRAIN+VAL; TEST kept for final evaluation.')
+        # Load train and val, then merge
+        X_tr, y_tr = load_npz_windows(args.windows)
+        y_tr = y_tr.flatten().astype(int)
+        X_vl, y_vl = load_npz_windows(args.val_windows)
+        y_vl = y_vl.flatten().astype(int)
+        print(f'[kfold] Loaded TRAIN {X_tr.shape} and VAL {X_vl.shape}')
+
+        # Infer orientation: prefer (N,F,T) when F < T; else detect and transpose later.
+        if X_tr.ndim != 3:
+            print('[kfold] ERROR: unexpected train array rank', X_tr.shape)
+            return
+        if X_tr.shape[1] < X_tr.shape[2]:  # (N,F,T)
+            feats_dim = X_tr.shape[1]
+            time_len = X_tr.shape[2]
+            need_transpose = False
+        else:  # (N,T,F)
+            feats_dim = X_tr.shape[2]
+            time_len = X_tr.shape[1]
+            need_transpose = True
+
+        # Realign val to same time_len (independent of orientation)
+        if need_transpose:
+            # Both arrays currently (N,T,F)
+            if X_vl.shape[1] != time_len:
+                cur_T = X_vl.shape[1]
+                if cur_T > time_len:
+                    print(f'[kfold][time-align] truncate val T={cur_T}->{time_len}')
+                    X_vl = X_vl[:, :time_len, :]
+                else:
+                    pad_T = time_len - cur_T
+                    print(f'[kfold][time-align] pad val T={cur_T}->{time_len} (+{pad_T})')
+                    pad_block = np.zeros((X_vl.shape[0], pad_T, X_vl.shape[2]), dtype=X_vl.dtype)
+                    X_vl = np.concatenate([X_vl, pad_block], axis=1)
+            # Transpose both to (N,F,T)
+            X_tr = np.transpose(X_tr, (0,2,1))
+            X_vl = np.transpose(X_vl, (0,2,1))
+        else:
+            # Orientation already (N,F,T); ensure val time matches
+            if X_vl.shape[2] != time_len:
+                cur_T = X_vl.shape[2]
+                if cur_T > time_len:
+                    print(f'[kfold][time-align] truncate val T={cur_T}->{time_len}')
+                    X_vl = X_vl[:, :, :time_len]
+                else:
+                    pad_T = time_len - cur_T
+                    print(f'[kfold][time-align] pad val T={cur_T}->{time_len} (+{pad_T})')
+                    pad_block = np.zeros((X_vl.shape[0], X_vl.shape[1], pad_T), dtype=X_vl.dtype)
+                    X_vl = np.concatenate([X_vl, pad_block], axis=2)
+
+        # Derive masks and align if present
+        def align_mask(mask, target_T):
+            if mask is None:
+                return None
+            if mask.shape[1] == target_T:
+                return mask
+            cur_T = mask.shape[1]
+            if cur_T > target_T:
+                return mask[:, :target_T]
+            return np.concatenate([mask, np.zeros((mask.shape[0], target_T - cur_T), dtype=mask.dtype)], axis=1)
+
+        m_tr_full = derive_mask(args.windows)
+        m_vl_full = derive_mask(args.val_windows)
+        if m_tr_full is not None and m_tr_full.shape[1] != time_len:
+            m_tr_full = align_mask(m_tr_full, time_len)
+        if m_vl_full is not None and m_vl_full.shape[1] != time_len:
+            m_vl_full = align_mask(m_vl_full, time_len)
+        if (m_tr_full is not None) and (m_vl_full is not None) and (len(m_tr_full) == len(X_tr)) and (len(m_vl_full) == len(X_vl)):
+            m_all = np.concatenate([m_tr_full, m_vl_full], axis=0)
+        else:
+            m_all = None
+            if m_tr_full is not None or m_vl_full is not None:
+                print('[kfold][mask] Disabled (incomplete or mismatched)')
+
+        # Merge X,y (inside k-fold block)
+        X_all = np.concatenate([X_tr, X_vl], axis=0)  # (N,F,T)
+        y_all = np.concatenate([y_tr, y_vl], axis=0)
+        input_shape = X_all.shape[1:]  # (F,T)
+        print(f'[kfold] Merged dataset: {X_all.shape} (F={input_shape[0]}, T={input_shape[1]}), positives={y_all.sum()} ({y_all.mean():.4f})')
+
+        # Prepare result root
+        if args.result_dir is None:
+            base_root = os.path.join(os.path.dirname(__file__), 'result_kfold')
+        else:
+            base_root = os.path.join(args.result_dir, 'kfold')
+        os.makedirs(base_root, exist_ok=True)
+        print('[kfold] Results root ->', base_root)
+
+        # K-fold splitter
+        skf = StratifiedKFold(n_splits=k, shuffle=True, random_state=int(args.kfold_seed))
+        fold_metrics = []
+
+        fold_idx = 0
+        for tr_index, va_index in skf.split(X_all, y_all):
+            fold_idx += 1
+            fold_dir = os.path.join(base_root, f'fold_{fold_idx:02d}')
+            os.makedirs(fold_dir, exist_ok=True)
+            print(f'[kfold] Fold {fold_idx}/{k} -> train={len(tr_index)}, val={len(va_index)}  dir={fold_dir}')
+
+            X_trn, y_trn = X_all[tr_index], y_all[tr_index]
+            X_val, y_val = X_all[va_index], y_all[va_index]
+            if m_all is not None:
+                m_trn, m_val = m_all[tr_index], m_all[va_index]
+                use_mask = True
+            else:
+                m_trn = m_val = None
+                use_mask = False
+
+            base_model = build_cnn_bilstm(
+                input_shape,
+                num_filters=64,
+                kernel_sizes=(3,5,3),
+                conv_dropout=0.2,
+                lstm_units=64,
+                lstm_dropout=0.2,
+                attn_units=32,
+                use_mask=use_mask,
+                mask_mode=MASK_MODE,
+                mask_threshold=MASK_THRESHOLD,
+            )
+            if int(args.accumulate_steps) > 1:
+                model = AccumModel(inputs=base_model.inputs, outputs=base_model.outputs, name=base_model.name, accumulate_steps=int(args.accumulate_steps))
+            else:
+                model = base_model
+            print(model.summary())
+
+            gamma_var = tf.Variable(float(args.focal_gamma_start), trainable=False, dtype=tf.float32, name=f'focal_gamma_var_fold{fold_idx}')
+            loss_fn = FocalLoss(alpha=float(args.focal_alpha), gamma_variable=gamma_var, from_logits=False)
+            model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=3e-4), loss=loss_fn, metrics=[tf.keras.metrics.AUC(name='auc')])
+
+            # callbacks per fold
+            chk_path = os.path.join(fold_dir, 'best.weights')
+            monitor_name = 'val_auc' if args.checkpoint_metric == 'auc' else ('val_composite' if args.checkpoint_metric == 'composite' else 'val_precision_aware')
+            checkpoint = tf.keras.callbacks.ModelCheckpoint(chk_path, monitor=monitor_name, mode='max', save_best_only=True, save_weights_only=True)
+            early = None if args.no_early_stop else tf.keras.callbacks.EarlyStopping(monitor=monitor_name, mode='max', patience=10, restore_best_weights=True)
+
+            if use_mask and m_val is not None:
+                X_val_inputs = [X_val, m_val]
+            else:
+                X_val_inputs = X_val
+            val_metric_cb = ValMetricsCallback(X_val, y_val, X_val_inputs=X_val_inputs, val_mask=m_val, window_mask_min_mean=args.window_mask_min_mean)
+            curriculum_cb = CurriculumCallback(gamma_var, start=args.focal_gamma_start, end=args.focal_gamma_end, epochs=args.curriculum_epochs, log_dir=fold_dir)
+            cbs = [checkpoint, curriculum_cb, val_metric_cb]
+            if early is not None:
+                cbs.insert(1, early)
+
+            class_weight = None
+            if args.class_weight_neg is not None or args.class_weight_pos is not None:
+                w_neg = float(args.class_weight_neg) if args.class_weight_neg is not None else 1.0
+                w_pos = float(args.class_weight_pos) if args.class_weight_pos is not None else 1.0
+                class_weight = {0: w_neg, 1: w_pos}
+
+            if use_mask and m_trn is not None:
+                model.fit([X_trn, m_trn], y_trn, epochs=args.epochs, batch_size=args.batch, validation_data=([X_val, m_val], y_val), callbacks=cbs, verbose=2, class_weight=class_weight)
+            else:
+                model.fit(X_trn, y_trn, epochs=args.epochs, batch_size=args.batch, validation_data=(X_val, y_val), callbacks=cbs, verbose=2, class_weight=class_weight)
+
+            # Load best and evaluate on fold val
+            if os.path.exists(chk_path):
+                try:
+                    model.load_weights(chk_path)
+                except Exception as e:
+                    print('[kfold] Warning: failed to load best weights:', e)
+
+            if use_mask and m_val is not None:
+                probs = model.predict([X_val, m_val], verbose=0)
+            else:
+                probs = model.predict(X_val, verbose=0)
+            if probs.ndim > 1 and probs.shape[-1] > 1:
+                probs = probs[:, 1]
+            probs = probs.reshape(-1)
+            if args.window_mask_min_mean is not None and m_val is not None:
+                try:
+                    m_mean = m_val.mean(axis=1)
+                    gate = (m_mean >= float(args.window_mask_min_mean)).astype(probs.dtype)
+                    probs = probs * gate
+                except Exception:
+                    pass
+            preds = (probs >= 0.5).astype(int)
+
+            auc = float(roc_auc_score(y_val, probs))
+            f1 = float(f1_score(y_val, preds, zero_division=0))
+            recall = float(recall_score(y_val, preds, zero_division=0))
+            tn, fp, fn, tp = confusion_matrix(y_val, preds).ravel()
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            composite = 0.5 * recall + 0.3 * f1 + 0.2 * auc
+            precision_aware = 0.5 * precision + 0.3 * f1 + 0.2 * auc
+
+            fold_metrics.append({'fold': fold_idx, 'auc': auc, 'f1': f1, 'recall': recall, 'precision': precision, 'composite': composite, 'precision_aware': precision_aware, 'TP': int(tp), 'FP': int(fp), 'FN': int(fn), 'TN': int(tn)})
+
+            # Save per-fold results
+            save_json(os.path.join(fold_dir, 'results.json'), {
+                'fold': fold_idx,
+                'val': fold_metrics[-1],
+                'params': {
+                    'model': 'cnn_bilstm_attn', 'batch': int(args.batch), 'accumulate_steps': int(args.accumulate_steps),
+                    'run_seed': (int(args.run_seed) if args.run_seed is not None else None), 'checkpoint_metric': args.checkpoint_metric,
+                    'focal_alpha': float(args.focal_alpha), 'focal_gamma_start': float(args.focal_gamma_start), 'focal_gamma_end': float(args.focal_gamma_end),
+                    'mask_mode': MASK_MODE, 'mask_threshold': MASK_THRESHOLD, 'window_mask_min_mean': (float(args.window_mask_min_mean) if args.window_mask_min_mean is not None else None),
+                }
+            })
+
+        # Aggregate CV metrics
+        import math
+        def _agg(key):
+            arr = np.array([m[key] for m in fold_metrics], dtype=float)
+            return float(arr.mean()), float(arr.std(ddof=1)) if len(arr) > 1 else 0.0
+        agg = {k: {'mean': _agg(k)[0], 'std': _agg(k)[1]} for k in ['auc','f1','recall','precision','composite','precision_aware']}
+        save_json(os.path.join(base_root, 'cv_summary.json'), {'k': k, 'folds': fold_metrics, 'aggregate': agg})
+        print('[kfold] CV aggregate:', agg)
+
+        # Final training on ALL (optionally with tiny internal val), then test eval
+        X_all_train = X_all
+        y_all_train = y_all
+        final_dir = os.path.join(base_root, 'final_all_train')
+        os.makedirs(final_dir, exist_ok=True)
+
+        if float(args.final_internal_val_ratio) > 0.0 and 0.0 < float(args.final_internal_val_ratio) < 0.5:
+            idx = np.arange(len(X_all_train))
+            tr_idx2, va_idx2 = train_test_split(idx, test_size=float(args.final_internal_val_ratio), stratify=y_all_train, random_state=int(args.kfold_seed))
+            X_trn_f, y_trn_f = X_all_train[tr_idx2], y_all_train[tr_idx2]
+            X_val_f, y_val_f = X_all_train[va_idx2], y_all_train[va_idx2]
+            if m_all is not None:
+                m_trn_f, m_val_f = m_all[tr_idx2], m_all[va_idx2]
+                use_mask_final = True
+            else:
+                m_trn_f = m_val_f = None
+                use_mask_final = False
+        else:
+            X_trn_f, y_trn_f = X_all_train, y_all_train
+            X_val_f = y_val_f = None
+            if m_all is not None:
+                m_trn_f = m_all
+                m_val_f = None
+                use_mask_final = True
+            else:
+                m_trn_f = m_val_f = None
+                use_mask_final = False
+
+        # Prepare test set
+        X_test, y_test = load_npz_windows(args.test_windows)
+        y_test = y_test.flatten().astype(int)
+        # Conform test orientation/time
+        if X_test.ndim != 3:
+            print('[kfold][final] ERROR: unexpected test rank', X_test.shape)
+            return
+        # Detect if test is (N,F,T) already
+        if X_test.shape[1] == input_shape[0] and X_test.shape[2] != input_shape[1]:
+            cur_T = X_test.shape[2]
+            tgt = input_shape[1]
+            if cur_T > tgt:
+                print(f'[kfold][final][time-align] truncate test T={cur_T}->{tgt}')
+                X_test = X_test[:, :, :tgt]
+            elif cur_T < tgt:
+                pad_T = tgt - cur_T
+                print(f'[kfold][final][time-align] pad test T={cur_T}->{tgt} (+{pad_T})')
+                pad_block = np.zeros((X_test.shape[0], X_test.shape[1], pad_T), dtype=X_test.dtype)
+                X_test = np.concatenate([X_test, pad_block], axis=2)
+        elif X_test.shape[2] == input_shape[0]:  # (N,T,F) -> transpose
+            X_test = np.transpose(X_test, (0,2,1))
+            cur_T = X_test.shape[2]
+            tgt = input_shape[1]
+            if cur_T > tgt:
+                X_test = X_test[:, :, :tgt]
+            elif cur_T < tgt:
+                pad_T = tgt - cur_T
+                pad_block = np.zeros((X_test.shape[0], X_test.shape[1], pad_T), dtype=X_test.dtype)
+                X_test = np.concatenate([X_test, pad_block], axis=2)
+        m_test = derive_mask(args.test_windows)
+        if m_test is not None and m_test.shape[1] != input_shape[1]:
+            m_test = align_mask(m_test, input_shape[1])
+
+        base_model = build_cnn_bilstm(
+            input_shape,
+            num_filters=64,
+            kernel_sizes=(3,5,3),
+            conv_dropout=0.2,
+            lstm_units=64,
+            lstm_dropout=0.2,
+            attn_units=32,
+            use_mask=use_mask_final,
+            mask_mode=MASK_MODE,
+            mask_threshold=MASK_THRESHOLD,
+        )
+        if int(args.accumulate_steps) > 1:
+            model = AccumModel(inputs=base_model.inputs, outputs=base_model.outputs, name=base_model.name, accumulate_steps=int(args.accumulate_steps))
+        else:
+            model = base_model
+        print(model.summary())
+
+        gamma_var = tf.Variable(float(args.focal_gamma_start), trainable=False, dtype=tf.float32, name='focal_gamma_var_final')
+        loss_fn = FocalLoss(alpha=float(args.focal_alpha), gamma_variable=gamma_var, from_logits=False)
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=3e-4), loss=loss_fn, metrics=[tf.keras.metrics.AUC(name='auc')])
+
+        class_weight = None
+        if args.class_weight_neg is not None or args.class_weight_pos is not None:
+            w_neg = float(args.class_weight_neg) if args.class_weight_neg is not None else 1.0
+            w_pos = float(args.class_weight_pos) if args.class_weight_pos is not None else 1.0
+            class_weight = {0: w_neg, 1: w_pos}
+
+        cbs = []
+        if X_val_f is not None:
+            chk_path_final = os.path.join(final_dir, 'best.weights')
+            monitor_name = 'val_auc' if args.checkpoint_metric == 'auc' else ('val_composite' if args.checkpoint_metric == 'composite' else 'val_precision_aware')
+            checkpoint = tf.keras.callbacks.ModelCheckpoint(chk_path_final, monitor=monitor_name, mode='max', save_best_only=True, save_weights_only=True)
+            early = None if args.no_early_stop else tf.keras.callbacks.EarlyStopping(monitor=monitor_name, mode='max', patience=10, restore_best_weights=True)
+            curriculum_cb = CurriculumCallback(gamma_var, start=args.focal_gamma_start, end=args.focal_gamma_end, epochs=args.curriculum_epochs, log_dir=final_dir)
+            # prepare val inputs/mask
+            X_val_in = [X_val_f, m_val_f] if (use_mask_final and m_val_f is not None) else X_val_f
+            val_metric_cb = ValMetricsCallback(X_val_f, y_val_f, X_val_inputs=X_val_in, val_mask=m_val_f, window_mask_min_mean=args.window_mask_min_mean)
+            cbs = [checkpoint, curriculum_cb, val_metric_cb]
+            if early is not None:
+                cbs.insert(1, early)
+            # train with val
+            if use_mask_final and m_trn_f is not None:
+                model.fit([X_trn_f, m_trn_f], y_trn_f, epochs=args.epochs, batch_size=args.batch, validation_data=([X_val_f, m_val_f], y_val_f), callbacks=cbs, verbose=2, class_weight=class_weight)
+            else:
+                model.fit(X_trn_f, y_trn_f, epochs=args.epochs, batch_size=args.batch, validation_data=(X_val_f, y_val_f), callbacks=cbs, verbose=2, class_weight=class_weight)
+            if os.path.exists(chk_path_final):
+                try:
+                    model.load_weights(chk_path_final)
+                except Exception as e:
+                    print('[kfold][final] Warning loading best:', e)
+        else:
+            # No validation: only curriculum schedule, no checkpoint/early
+            curriculum_cb = CurriculumCallback(gamma_var, start=args.focal_gamma_start, end=args.focal_gamma_end, epochs=args.curriculum_epochs, log_dir=final_dir)
+            if use_mask_final and m_trn_f is not None:
+                model.fit([X_trn_f, m_trn_f], y_trn_f, epochs=args.epochs, batch_size=args.batch, callbacks=[curriculum_cb], verbose=2, class_weight=class_weight)
+            else:
+                model.fit(X_trn_f, y_trn_f, epochs=args.epochs, batch_size=args.batch, callbacks=[curriculum_cb], verbose=2, class_weight=class_weight)
+
+        # Test evaluation
+        if use_mask_final and m_test is not None:
+            probs_t = model.predict([X_test, m_test], verbose=0)
+        else:
+            probs_t = model.predict(X_test, verbose=0)
+        if probs_t.ndim > 1 and probs_t.shape[-1] > 1:
+            probs_t = probs_t[:, 1]
+        probs_t = probs_t.reshape(-1)
+        if args.window_mask_min_mean is not None and m_test is not None:
+            try:
+                m_mean = m_test.mean(axis=1)
+                gate = (m_mean >= float(args.window_mask_min_mean)).astype(probs_t.dtype)
+                probs_t = probs_t * gate
+            except Exception:
+                pass
+        preds_t = (probs_t >= 0.5).astype(int)
+
+        auc_t = float(roc_auc_score(y_test, probs_t))
+        f1_t = float(f1_score(y_test, preds_t, zero_division=0))
+        recall_t = float(recall_score(y_test, preds_t, zero_division=0))
+        tn, fp, fn, tp = confusion_matrix(y_test, preds_t).ravel()
+        precision_t = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        composite_t = 0.5 * recall_t + 0.3 * f1_t + 0.2 * auc_t
+        precision_aware_t = 0.5 * precision_t + 0.3 * f1_t + 0.2 * auc_t
+
+        save_json(os.path.join(final_dir, 'final_test_results.json'), {
+            'test': {
+                'auc': auc_t, 'f1': f1_t, 'recall': recall_t, 'precision': precision_t,
+                'composite': composite_t, 'precision_aware': precision_aware_t,
+                'TP': int(tp), 'FP': int(fp), 'FN': int(fn), 'TN': int(tn)
+            },
+            'cv_summary': {'k': k, 'aggregate': agg}
+        })
+        print('[kfold][final] Test metrics:', {'auc': auc_t, 'f1': f1_t, 'recall': recall_t, 'precision': precision_t, 'composite': composite_t, 'precision_aware': precision_aware_t})
+
+        # -------------------------------------------------
+        # Fold ensemble: average probabilities of each fold
+        # -------------------------------------------------
+        try:
+            ens_probs_list = []
+            for fdir in sorted([d for d in os.listdir(base_root) if d.startswith('fold_')]):
+                fold_path = os.path.join(base_root, fdir, 'best.weights')
+                if not os.path.exists(fold_path):
+                    print(f'[kfold][ensemble] skip {fdir} (no best.weights)')
+                    continue
+                # Rebuild model with same config & use_mask_final logic (mask usage during inference depends on m_test availability)
+                fold_base = build_cnn_bilstm(
+                    input_shape,
+                    num_filters=64,
+                    kernel_sizes=(3,5,3),
+                    conv_dropout=0.2,
+                    lstm_units=64,
+                    lstm_dropout=0.2,
+                    attn_units=32,
+                    use_mask=(m_test is not None),
+                    mask_mode=MASK_MODE,
+                    mask_threshold=MASK_THRESHOLD,
+                )
+                fold_model = fold_base
+                try:
+                    fold_model.load_weights(fold_path)
+                except Exception as e:
+                    print(f'[kfold][ensemble] load fail {fdir}:', e)
+                    continue
+                if m_test is not None:
+                    fp = fold_model.predict([X_test, m_test], verbose=0)
+                else:
+                    fp = fold_model.predict(X_test, verbose=0)
+                if fp.ndim > 1 and fp.shape[-1] > 1:
+                    fp = fp[:,1]
+                fp = fp.reshape(-1)
+                ens_probs_list.append(fp)
+            if ens_probs_list:
+                ens_probs = np.mean(np.stack(ens_probs_list, axis=0), axis=0)
+                if args.window_mask_min_mean is not None and m_test is not None:
+                    try:
+                        m_mean = m_test.mean(axis=1)
+                        gate = (m_mean >= float(args.window_mask_min_mean)).astype(ens_probs.dtype)
+                        ens_probs = ens_probs * gate
+                    except Exception:
+                        pass
+                ens_preds = (ens_probs >= 0.5).astype(int)
+                auc_e = float(roc_auc_score(y_test, ens_probs))
+                f1_e = float(f1_score(y_test, ens_preds, zero_division=0))
+                recall_e = float(recall_score(y_test, ens_preds, zero_division=0))
+                tn_e, fp_e, fn_e, tp_e = confusion_matrix(y_test, ens_preds).ravel()
+                precision_e = tp_e / (tp_e + fp_e) if (tp_e + fp_e) > 0 else 0.0
+                composite_e = 0.5 * recall_e + 0.3 * f1_e + 0.2 * auc_e
+                precision_aware_e = 0.5 * precision_e + 0.3 * f1_e + 0.2 * auc_e
+                save_json(os.path.join(final_dir, 'ensemble_test_results.json'), {
+                    'ensemble_test': {
+                        'auc': auc_e, 'f1': f1_e, 'recall': recall_e, 'precision': precision_e,
+                        'composite': composite_e, 'precision_aware': precision_aware_e,
+                        'TP': int(tp_e), 'FP': int(fp_e), 'FN': int(fn_e), 'TN': int(tn_e),
+                        'folds_used': len(ens_probs_list)
+                    }
+                })
+                print('[kfold][ensemble] Test metrics:', {'auc': auc_e, 'f1': f1_e, 'recall': recall_e, 'precision': precision_e, 'composite': composite_e, 'precision_aware': precision_aware_e, 'folds_used': len(ens_probs_list)})
+            else:
+                print('[kfold][ensemble] No fold weights available for ensemble.')
+        except Exception as e:
+            print('[kfold][ensemble] ERROR:', e)
+
+        # Completed K-fold pipeline -> return
+        return
     if external_val:
         # Load full training set
         X_train, y_train = load_npz_windows(args.windows)

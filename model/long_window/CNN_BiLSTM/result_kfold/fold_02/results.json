@@ -1,0 +1,29 @@
+{
+  "fold": 2,
+  "val": {
+    "fold": 2,
+    "auc": 0.800568265321119,
+    "f1": 0.7079037800687286,
+    "recall": 0.6912751677852349,
+    "precision": 0.7253521126760564,
+    "composite": 0.7181223709774598,
+    "precision_aware": 0.7351608434228705,
+    "TP": 103,
+    "FP": 39,
+    "FN": 46,
+    "TN": 98
+  },
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 16,
+    "accumulate_steps": 8,
+    "run_seed": null,
+    "checkpoint_metric": "auc",
+    "focal_alpha": 0.4,
+    "focal_gamma_start": 0.0,
+    "focal_gamma_end": 1.0,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": null
+  }
+}

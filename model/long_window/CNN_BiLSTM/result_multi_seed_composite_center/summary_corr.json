@@ -1,0 +1,6 @@
+{
+  "val_best_composite__test_composite": -0.13552199938858903,
+  "val_best_composite__test_precision_aware": -0.15432917393016493,
+  "val_best_precision_aware__test_precision_aware": 0.0031271888538816576,
+  "val_best_precision_aware__test_composite": -0.318795525611363
+}

@@ -246,6 +246,34 @@ def load_eigen_csv(path: str) -> Tuple[List[Dict[str, float]], List[str]]:
 						except Exception:
 							d[name] = math.nan
 			rows.append(d)
+	# Backward-compat: older eigen CSV may miss normalized mouth-hand distances
+	# If so, synthesize them using 3D shoulder width for scale.
+	missing_norms = []
+	for col in ("norm_dist_leftHand_mouth", "norm_dist_rightHand_mouth"):
+		if col not in header:
+			missing_norms.append(col)
+	if missing_norms:
+		# Define sources for synthesis
+		need_map = {
+			"dist_leftHand_mouth": "norm_dist_leftHand_mouth",
+			"dist_rightHand_mouth": "norm_dist_rightHand_mouth",
+		}
+		can_compute = ("shoulder_width_3d" in header) and all(src in header for src in need_map.keys())
+		for fr in rows:
+			den = fr.get("shoulder_width_3d", math.nan)
+			for src, tgt in need_map.items():
+				# if target exists already, don't overwrite
+				if tgt in fr:
+					continue
+				val = fr.get(src, math.nan)
+				if can_compute and (not math.isnan(val)) and (not math.isnan(den)) and den > 1e-6:
+					fr[tgt] = val / den
+				else:
+					fr[tgt] = math.nan
+		# extend header in stable order (append at end)
+		for col in ("norm_dist_leftHand_mouth", "norm_dist_rightHand_mouth"):
+			if col not in header:
+				header.append(col)
 	return rows, header
 
 
@@ -345,6 +373,7 @@ def process_video(
 	long_win: int,
 	long_stride: int,
 	smoke_ratio_thresh: float,
+	label_mode: str,
 	long_norm_stats: Dict[str, Tuple[float, float]],
 	short_writer,
 	long_writer,
@@ -388,7 +417,12 @@ def process_video(
 		labs = frame_labels[s:e]
 		smoke_frames = sum(1 for L in labs if L == "smoke")
 		ratio = smoke_frames / len(labs)
-		label = "smoke" if ratio >= smoke_ratio_thresh else "no_smoke"
+		if label_mode == "center":
+			mid = s + (e - s) // 2
+			center_lab = frame_labels[mid] if 0 <= mid < len(frame_labels) else "no_smoke"
+			label = "smoke" if center_lab == "smoke" else "no_smoke"
+		else:
+			label = "smoke" if ratio >= smoke_ratio_thresh else "no_smoke"
 		per_stats = compute_video_stats(sub, feat_cols)
 		row_meta = [video_id, "short", short_index, sub[0].get("frame", 0), sub[-1].get("frame", 0),
 					f"{sub[0].get('time_sec',0.0):.6f}", f"{sub[-1].get('time_sec',0.0):.6f}", label, f"{ratio:.4f}", len(sub), f"{float(weight):.4f}"]
@@ -583,7 +617,12 @@ def process_video(
 		labs = frame_labels[s:e]
 		smoke_frames = sum(1 for L in labs if L == "smoke")
 		ratio = smoke_frames / len(labs)
-		label = "smoke" if ratio >= smoke_ratio_thresh else "no_smoke"
+		if label_mode == "center":
+			mid = s + (e - s) // 2
+			center_lab = frame_labels[mid] if 0 <= mid < len(frame_labels) else "no_smoke"
+			label = "smoke" if center_lab == "smoke" else "no_smoke"
+		else:
+			label = "smoke" if ratio >= smoke_ratio_thresh else "no_smoke"
 		long_total += 1
 		if label == "smoke":
 			long_smoke += 1
@@ -703,6 +742,7 @@ def main():
 	ap.add_argument("--long_win", type=int, default=75)
 	ap.add_argument("--long_stride", type=int, default=40)
 	ap.add_argument("--smoke_ratio_thresh", type=float, default=0.5, help="視窗內 smoke 幀比例達阈值則標記 smoke")
+	ap.add_argument("--label_mode", choices=["ratio","center"], default="ratio", help="標記策略：ratio=以比例與閾值；center=以中心幀標籤")
 	ap.add_argument("--long_norm_scope", choices=["video", "dataset"], default="video", help="長視窗 z-score 正規化範圍")
 	ap.add_argument("--all_features", action="store_true", help="使用全部特徵欄位 (排除 frame/time_sec)")
 	ap.add_argument("--video_filter", nargs="*", help="只處理指定 video_id (以檔名前綴, 例如 1 2 15)")
@@ -933,7 +973,7 @@ def main():
 			st, ss, lt, ls = process_video(
 				video_id, frames, labels, feat_cols,
 				args.short_win, args.short_stride, args.long_win, args.long_stride,
-				args.smoke_ratio_thresh, long_stats,
+				args.smoke_ratio_thresh, args.label_mode, long_stats,
 				short_writer, long_writer, short_header_written, long_header_written,
 				phases=video_phase_cache.get(video_id),
 				dist_min_series=video_dist_cache.get(video_id),

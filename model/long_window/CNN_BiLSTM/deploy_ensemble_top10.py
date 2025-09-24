@@ -124,6 +124,21 @@ def main():
     # Load test data (used here as example input for saving probs)
     print('Loading data...')
     X_test, y_test = load_npz_windows(args.windows)
+    # Preflight diagnostics
+    try:
+        dd = np.load(args.windows, allow_pickle=True)
+        feat_list = list(dd.get('feature_list', []))
+        fcnt = len(feat_list)
+    except Exception:
+        feat_list = []
+        fcnt = 0
+    print(f"Input windows: X.shape={getattr(X_test,'shape',None)}, y.shape={getattr(y_test,'shape',None)}, feature_count(meta)={fcnt}")
+    if X_test.ndim != 3:
+        raise ValueError(f"Expected 3D windows array, got shape {X_test.shape}")
+    # expect (N,F,T); if (N,T,F) slipped through, swap
+    if fcnt > 0 and X_test.shape[1] != fcnt and X_test.shape[2] == fcnt:
+        print('[WARN] Detected (N,T,F) layout; transposing to (N,F,T).')
+        X_test = np.transpose(X_test, (0,2,1))
     m_test = None
 
     # Optionally load a separate calibration (validation) set for temperature fitting
@@ -134,6 +149,18 @@ def main():
         if os.path.exists(args.calib_windows):
             print(f'Loading calibration data from {args.calib_windows}...')
             X_calib, y_calib = load_npz_windows(args.calib_windows)
+            # align axes if needed
+            try:
+                dd2 = np.load(args.calib_windows, allow_pickle=True)
+                feat_list2 = list(dd2.get('feature_list', []))
+                fcnt2 = len(feat_list2)
+            except Exception:
+                fcnt2 = 0
+            if X_calib.ndim != 3:
+                raise ValueError(f"Calibration NPZ must be 3D, got {X_calib.shape}")
+            if fcnt2 > 0 and X_calib.shape[1] != fcnt2 and X_calib.shape[2] == fcnt2:
+                print('[WARN] Detected (N,T,F) layout in calib; transposing to (N,F,T).')
+                X_calib = np.transpose(X_calib, (0,2,1))
             use_calib = True
         else:
             print(f'Calibration file {args.calib_windows} not found; falling back to main windows for calibration')
@@ -145,6 +172,9 @@ def main():
         input_shape = (36, 30)
     else:
         input_shape = (X_test.shape[1], X_test.shape[2])
+    if fcnt and input_shape[0] != fcnt:
+        # hard stop with actionable message
+        raise ValueError(f"Feature dimension mismatch: model expects F={input_shape[0]} from input array, but feature_list meta reports {fcnt}. Ensure NPZ was generated with the same CORE_FEATURES order/length as training (expected 36). Last 5 features in NPZ: {feat_list[-5:] if feat_list else 'unknown'}")
 
     model_template = build_cnn_bilstm(
         input_shape=input_shape,
