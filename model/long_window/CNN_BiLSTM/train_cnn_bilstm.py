@@ -218,11 +218,26 @@ class CurriculumCallback(tf.keras.callbacks.Callback):
         print(f'Curriculum: set focal gamma = {new_gamma:.4f} (epoch {epoch + 1})')
 
 
+def _parse_optional_float(v: str):
+    if v is None:
+        return None
+    if isinstance(v, str) and v.lower() in ('none', 'null', 'nan', 'na'):
+        return None
+    return float(v)
+
+def _parse_optional_path(v: str):
+    if v is None:
+        return None
+    if isinstance(v, str) and v.lower() in ('none', 'null', 'nan', 'na', ''):
+        return None
+    return v
+
+
 def parse_args(argv: list | None = None):
     p = argparse.ArgumentParser()
-    p.add_argument('--windows', default='/home/user/projects/train/train_data/slipce_thresh040/windows_npz.npz')
-    p.add_argument('--val_windows', default='/home/user/projects/train/Val_data/slipce_thresh040/windows_npz.npz', help='Optional separate validation set NPZ (if provided, disable internal split). Default set to Val_data/slipce_thresh040/windows_npz.npz')
-    p.add_argument('--test_windows', default='/home/user/projects/train/test_data/slipce_thresh040/windows_npz.npz', help='Optional separate test set NPZ. If provided alone (without --val_windows), internal split provides train/val and this file is used purely as external test. Default set to test_data/slipce_thresh040/windows_npz.npz')
+    p.add_argument('--windows', type=_parse_optional_path, default='/home/user/projects/train/train_data/slipce_thresh040/windows_npz.npz')
+    p.add_argument('--val_windows', type=_parse_optional_path, default='/home/user/projects/train/Val_data/slipce_thresh040/windows_npz.npz', help='Optional separate validation set NPZ (if provided, disable internal split). Use None to skip. Default Val_data/slipce_thresh040/windows_npz.npz')
+    p.add_argument('--test_windows', type=_parse_optional_path, default='/home/user/projects/train/test_data/slipce_thresh040/windows_npz.npz', help='Optional separate test set NPZ. Use None to skip external test. Default test_data/slipce_thresh040/windows_npz.npz')
     # K-fold CV controls (when >1, will merge train+val and do stratified k-fold; test kept for final eval)
     p.add_argument('--kfold', type=int, default=0, help='Stratified K-fold CV splits. 0 or 1 to disable; >=2 to enable (e.g., 5). Requires --val_windows present to merge train+val.')
     p.add_argument('--kfold_seed', type=int, default=42, help='Random seed for K-fold shuffling')
@@ -244,12 +259,17 @@ def parse_args(argv: list | None = None):
     # Mask controls
     p.add_argument('--mask_threshold', type=float, default=0.6, help='Attention mask threshold (used by model when use_mask=True)')
     p.add_argument('--mask_mode', choices=['soft', 'hard'], default='soft', help='Mask mode for attention weighting')
-    p.add_argument('--window_mask_min_mean', type=float, default=None, help='Window-level gating: only allow positive if mean(mask) >= t')
+    p.add_argument('--window_mask_min_mean', type=_parse_optional_float, default=None, help="Window-level gating: only allow positive if mean(mask) >= t; use 'None' to disable")
     return p.parse_args(argv)
 
 
 def main():
     args = parse_args()
+    # Normalize string 'None' passed via CLI (argparse keeps it as literal string)
+    for attr in ['val_windows', 'test_windows']:
+        v = getattr(args, attr, None)
+        if isinstance(v, str) and v.lower() in ('none', 'null', 'nan', 'na'):
+            setattr(args, attr, None)
     # Early feature alignment check (if external val/test provided). Use args.windows as train set; val/test precedence for test.
     test_npz_for_check = args.test_windows if args.test_windows else (args.val_windows if args.val_windows else None)
     try:
@@ -850,10 +870,33 @@ def main():
             return np.concatenate([mask, np.zeros((mask.shape[0], pad_T), dtype=mask.dtype)], axis=1)
 
         if m_train is not None:
-            target_T = X_train.shape[1]
+            # Determine orientation (N,F,T) vs (N,T,F); project standard is (N,F,T) with F < T.
+            if X_train.ndim != 3:
+                print('[mask] Unexpected rank for X_train when aligning mask -> disabling mask')
+                m_train = m_val = m_test = None
+            else:
+                if X_train.shape[1] < X_train.shape[2]:  # (N,F,T)
+                    feature_dim = X_train.shape[1]
+                    time_len = X_train.shape[2]
+                else:  # (N,T,F)
+                    feature_dim = X_train.shape[2]
+                    time_len = X_train.shape[1]
+                target_T = time_len
             m_train = align_mask(m_train, target_T)
             m_val = align_mask(m_val, target_T)
             m_test = align_mask(m_test, target_T)
+            if m_train is not None:
+                def _maybe_fix(ms):
+                    if ms is None:
+                        return None
+                    if ms.ndim == 2 and ms.shape[1] == time_len:
+                        return ms
+                    # Any mismatch -> disable (conservative)
+                    print('[mask] Unexpected mask shape', ms.shape, 'expected (N,', time_len, ') -> disabling mask usage.')
+                    return None
+                m_train = _maybe_fix(m_train)
+                m_val = _maybe_fix(m_val)
+                m_test = _maybe_fix(m_test)
         # Consistency: only use mask if all three available with matching lengths
         use_mask = (m_train is not None and m_val is not None and m_test is not None
                     and len(m_train)==len(X_train) and len(m_val)==len(X_val) and len(m_test)==len(X_test))

@@ -1,0 +1,50 @@
+{
+  "test": {
+    "auc": 0.6610075938686544,
+    "f1": 0.46658851113716293,
+    "recall": 0.36380255941499084,
+    "precision": 0.6503267973856209,
+    "composite": 0.45407935182237513,
+    "precision_aware": 0.5973414708076902,
+    "TP": 199,
+    "FP": 107,
+    "FN": 348,
+    "TN": 413
+  },
+  "top_epochs": "N/A (clean split, no validation ranking)",
+  "top_epochs_precision_aware": "N/A (clean split, no validation ranking)",
+  "params": {
+    "model": "tcn_attention",
+    "split": "short",
+    "device": "cuda",
+    "num_params": 473091,
+    "epochs": 5,
+    "batch_size": 256,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "seed": 42,
+    "use_norm": true,
+    "balance_by_class": true,
+    "amplify_hard_negative": true,
+    "hard_negative_factor": 1.5,
+    "temporal_jitter_frames": 0,
+    "val_ratio": 0.2,
+    "num_workers": 0,
+    "params": {
+      "tcn_channels": "128,128,128",
+      "tcn_kernel": 5,
+      "tcn_dropout": 0.1,
+      "tcn_dil_growth": 2,
+      "attn_type": "additive",
+      "attn_hidden": 128,
+      "mhsa_heads": 4,
+      "fc_hidden": 128,
+      "fc_dropout": 0.2
+    },
+    "data": {
+      "N": 3804,
+      "T": 30,
+      "F": 36
+    }
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "test": {
+    "auc": 0.5923242082662372,
+    "f1": 0.6025316455696202,
+    "recall": 0.5509259259259259,
+    "precision": 0.664804469273743,
+    "composite": 0.5746872982870965,
+    "precision_aware": 0.6316265699610051,
+    "TP": 119,
+    "FP": 60,
+    "FN": 97,
+    "TN": 78
+  },
+  "top_epochs": [
+    {
+      "epoch": 13,
+      "auc": 0.691991341991342,
+      "f1": 0.8425531914893617,
+      "recall": 0.9,
+      "precision": 0.792,
+      "score": 0.841164225845077,
+      "precision_aware": 0.787164225845077,
+      "TP": 99,
+      "FP": 26,
+      "FN": 11,
+      "TN": 16
+    },
+    {
+      "epoch": 37,
+      "auc": 0.7653679653679654,
+      "f1": 0.8387096774193549,
+      "recall": 0.8272727272727273,
+      "precision": 0.8504672897196262,
+      "score": 0.8183228599357633,
+      "precision_aware": 0.8299201411592125,
+      "TP": 91,
+      "FP": 16,
+      "FN": 19,
+      "TN": 26
+    },
+    {
+      "epoch": 45,
+      "auc": 0.7235930735930736,
+      "f1": 0.8198198198198198,
+      "recall": 0.8272727272727273,
+      "precision": 0.8125,
+      "score": 0.8043009243009243,
+      "precision_aware": 0.7969145606645606,
+      "TP": 91,
+      "FP": 21,
+      "FN": 19,
+      "TN": 21
+    },
+    {
+      "epoch": 34,
+      "auc": 0.7584415584415585,
+      "f1": 0.8165137614678899,
+      "recall": 0.8090909090909091,
+      "precision": 0.8240740740740741,
+      "score": 0.8011878946741331,
+      "precision_aware": 0.8086794771657158,
+      "TP": 89,
+      "FP": 19,
+      "FN": 21,
+      "TN": 23
+    }
+  ],
+  "top_epochs_precision_aware": [
+    {
+      "epoch": 37,
+      "auc": 0.7653679653679654,
+      "f1": 0.8387096774193549,
+      "recall": 0.8272727272727273,
+      "precision": 0.8504672897196262,
+      "score": 0.8183228599357633,
+      "precision_aware": 0.8299201411592125,
+      "TP": 91,
+      "FP": 16,
+      "FN": 19,
+      "TN": 26
+    },
+    {
+      "epoch": 40,
+      "auc": 0.7627705627705629,
+      "f1": 0.8113207547169812,
+      "recall": 0.7818181818181819,
+      "precision": 0.8431372549019608,
+      "score": 0.7868594298782978,
+      "precision_aware": 0.8175189664201873,
+      "TP": 86,
+      "FP": 16,
+      "FN": 24,
+      "TN": 26
+    },
+    {
+      "epoch": 22,
+      "auc": 0.7562770562770563,
+      "f1": 0.743455497382199,
+      "recall": 0.6454545454545455,
+      "precision": 0.8765432098765432,
+      "score": 0.6970193331973438,
+      "precision_aware": 0.8125636654083426,
+      "TP": 71,
+      "FP": 10,
+      "FN": 39,
+      "TN": 32
+    },
+    {
+      "epoch": 42,
+      "auc": 0.7792207792207791,
+      "f1": 0.7487179487179487,
+      "recall": 0.6636363636363637,
+      "precision": 0.8588235294117647,
+      "score": 0.7122777222777223,
+      "precision_aware": 0.8098713051654227,
+      "TP": 73,
+      "FP": 12,
+      "FN": 37,
+      "TN": 30
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 32,
+    "accumulate_steps": 1,
+    "effective_batch": 32,
+    "run_seed": 43,
+    "focal_alpha": 0.4,
+    "focal_gamma_start": 0.0,
+    "focal_gamma_end": 1.0,
+    "curriculum_epochs": 20,
+    "class_weight_neg": 1.05,
+    "class_weight_pos": 0.8,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": null,
+    "checkpoint_metric": "auc"
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce_thresh040/windows_npz.npz --val_windows /home/user/projects/train/Val_data/slipce_thresh040/windows_npz.npz --test_windows /home/user/projects/train/test_data/slipce_thresh040/windows_npz.npz --kfold 0 --kfold_seed 42 --final_internal_val_ratio 0.0 --epochs 50 --batch 32 --accumulate_steps 1 --result_dir /home/user/projects/train/model/long_window/CNN_BiLSTM/exp_thresh040_fullrun --focal_alpha 0.4 --focal_gamma_start 0.0 --focal_gamma_end 1.0 --curriculum_epochs 20 --no_early_stop --run_seed 43 --checkpoint_metric auc --class_weight_neg 1.05 --class_weight_pos 0.8 --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean None  [auto-mask: occlusion_flag]"
+}

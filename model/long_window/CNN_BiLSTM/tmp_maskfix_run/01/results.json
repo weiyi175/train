@@ -1,0 +1,62 @@
+{
+  "test": {
+    "auc": 0.7588231347289319,
+    "f1": 0.37681159420289856,
+    "recall": 0.24074074074074073,
+    "precision": 0.8666666666666667,
+    "composite": 0.38517847557702634,
+    "precision_aware": 0.6981414385399893,
+    "TP": 52,
+    "FP": 8,
+    "FN": 164,
+    "TN": 130
+  },
+  "top_epochs": [
+    {
+      "epoch": 1,
+      "auc": 0.6655844155844155,
+      "f1": 0.3181818181818182,
+      "recall": 0.19090909090909092,
+      "precision": 0.9545454545454546,
+      "score": 0.324025974025974,
+      "precision_aware": 0.7058441558441558,
+      "TP": 21,
+      "FP": 1,
+      "FN": 89,
+      "TN": 41
+    }
+  ],
+  "top_epochs_precision_aware": [
+    {
+      "epoch": 1,
+      "auc": 0.6655844155844155,
+      "f1": 0.3181818181818182,
+      "recall": 0.19090909090909092,
+      "precision": 0.9545454545454546,
+      "score": 0.324025974025974,
+      "precision_aware": 0.7058441558441558,
+      "TP": 21,
+      "FP": 1,
+      "FN": 89,
+      "TN": 41
+    }
+  ],
+  "params": {
+    "model": "cnn_bilstm_attn",
+    "batch": 32,
+    "accumulate_steps": 1,
+    "effective_batch": 32,
+    "run_seed": 43,
+    "focal_alpha": 0.4,
+    "focal_gamma_start": 0.0,
+    "focal_gamma_end": 1.0,
+    "curriculum_epochs": 20,
+    "class_weight_neg": 1.05,
+    "class_weight_pos": 0.8,
+    "mask_mode": "soft",
+    "mask_threshold": 0.6,
+    "window_mask_min_mean": null,
+    "checkpoint_metric": "auc"
+  },
+  "cmd": "python train_cnn_bilstm.py --windows /home/user/projects/train/train_data/slipce_thresh040/windows_npz.npz --val_windows /home/user/projects/train/Val_data/slipce_thresh040/windows_npz.npz --test_windows /home/user/projects/train/test_data/slipce_thresh040/windows_npz.npz --kfold 0 --kfold_seed 42 --final_internal_val_ratio 0.0 --epochs 1 --batch 32 --accumulate_steps 1 --result_dir /home/user/projects/train/model/long_window/CNN_BiLSTM/tmp_maskfix_run --focal_alpha 0.4 --focal_gamma_start 0.0 --focal_gamma_end 1.0 --curriculum_epochs 20 --no_early_stop --run_seed 43 --checkpoint_metric auc --class_weight_neg 1.05 --class_weight_pos 0.8 --mask_threshold 0.6 --mask_mode soft --window_mask_min_mean None  [auto-mask: occlusion_flag]"
+}
