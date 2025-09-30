@@ -1,0 +1,30 @@
+{
+  "base@0.5": {
+    "auc": 0.7802603327965648,
+    "f1": 0.7898089171974523,
+    "recall": 0.8611111111111112,
+    "precision": 0.7294117647058823,
+    "composite": 0.8235502972741042,
+    "precision_aware": 0.7577006240714899,
+    "TP": 186,
+    "FP": 69,
+    "FN": 30,
+    "TN": 69
+  },
+  "cfg": {
+    "short_probs": "/home/user/projects/train/model/mix_winndow/out_run42/mix_short_on_long_probs.npy",
+    "long_probs": "/home/user/projects/train/model/mix_winndow/out_run42/mix_long_probs.npy",
+    "labels": "/home/user/projects/train/model/mix_winndow/out_run42/mix_labels.npy",
+    "fusion": "mlp",
+    "epochs": 120,
+    "batch": 128,
+    "lr": 0.005,
+    "weight_decay": 0.0001,
+    "val_ratio": 0.2,
+    "seed": 42,
+    "sweep_thresholds": true,
+    "out": "/home/user/projects/train/model/mix_winndow/out_run42/fusion_mlp",
+    "no_train": false,
+    "save_probs": false
+  }
+}

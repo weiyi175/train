@@ -1,0 +1,48 @@
+{
+  "test": {
+    "auc": 0.6457565743214738,
+    "f1": 0.5356004250797024,
+    "recall": 0.4606946983546618,
+    "precision": 0.6395939086294417,
+    "composite": 0.5201787915655364,
+    "precision_aware": 0.6096283967029263,
+    "TP": 252,
+    "FP": 142,
+    "FN": 295,
+    "TN": 378
+  },
+  "top_epochs": "N/A (clean split, no validation ranking)",
+  "top_epochs_precision_aware": "N/A (clean split, no validation ranking)",
+  "params": {
+    "model": "gcn_tcn",
+    "split": "short",
+    "device": "cuda",
+    "num_params": 94930,
+    "epochs": 70,
+    "batch_size": 64,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "seed": 50,
+    "use_norm": true,
+    "balance_by_class": true,
+    "amplify_hard_negative": true,
+    "hard_negative_factor": 1.5,
+    "temporal_jitter_frames": 0,
+    "val_ratio": 0.2,
+    "num_workers": 0,
+    "params": {
+      "gcn_hidden": 64,
+      "tcn_channels": "128,128",
+      "tcn_kernel": 3,
+      "tcn_dropout": 0.1,
+      "tcn_dil_growth": 2,
+      "fc_hidden": 128,
+      "fc_dropout": 0.2
+    },
+    "data": {
+      "N": 3804,
+      "T": 30,
+      "F": 36
+    }
+  }
+}

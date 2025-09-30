@@ -1,0 +1,93 @@
+# 訓練報告 (clean no-val 模式)
+- 模型: gcn_tcn | 裝置: cuda | 參數量: 94930
+- 訓練資料: N=3804 T=30 F=36 | epochs=70 | batch=256
+## Epoch 訓練紀錄 (train_loss / train_acc)
+- epoch 1: loss=0.6914, acc=0.5234
+- epoch 2: loss=0.6882, acc=0.5539
+- epoch 3: loss=0.6849, acc=0.5715
+- epoch 4: loss=0.6808, acc=0.5860
+- epoch 5: loss=0.6768, acc=0.5991
+- epoch 6: loss=0.6692, acc=0.6217
+- epoch 7: loss=0.6636, acc=0.6183
+- epoch 8: loss=0.6580, acc=0.6196
+- epoch 9: loss=0.6488, acc=0.6435
+- epoch 10: loss=0.6367, acc=0.6538
+- epoch 11: loss=0.6307, acc=0.6527
+- epoch 12: loss=0.6295, acc=0.6583
+- epoch 13: loss=0.6177, acc=0.6643
+- epoch 14: loss=0.6144, acc=0.6690
+- epoch 15: loss=0.5990, acc=0.6958
+- epoch 16: loss=0.6017, acc=0.6864
+- epoch 17: loss=0.5863, acc=0.6945
+- epoch 18: loss=0.5821, acc=0.6956
+- epoch 19: loss=0.5777, acc=0.7011
+- epoch 20: loss=0.5770, acc=0.6998
+- epoch 21: loss=0.5534, acc=0.7300
+- epoch 22: loss=0.5478, acc=0.7266
+- epoch 23: loss=0.5414, acc=0.7298
+- epoch 24: loss=0.5357, acc=0.7295
+- epoch 25: loss=0.5233, acc=0.7403
+- epoch 26: loss=0.5241, acc=0.7353
+- epoch 27: loss=0.5062, acc=0.7566
+- epoch 28: loss=0.5054, acc=0.7553
+- epoch 29: loss=0.5045, acc=0.7608
+- epoch 30: loss=0.4997, acc=0.7529
+- epoch 31: loss=0.4827, acc=0.7744
+- epoch 32: loss=0.4812, acc=0.7760
+- epoch 33: loss=0.4684, acc=0.7860
+- epoch 34: loss=0.4714, acc=0.7839
+- epoch 35: loss=0.4485, acc=0.7860
+- epoch 36: loss=0.4551, acc=0.7892
+- epoch 37: loss=0.4466, acc=0.7928
+- epoch 38: loss=0.4253, acc=0.8183
+- epoch 39: loss=0.4362, acc=0.7997
+- epoch 40: loss=0.4301, acc=0.8023
+- epoch 41: loss=0.4126, acc=0.8149
+- epoch 42: loss=0.4056, acc=0.8223
+- epoch 43: loss=0.4190, acc=0.8036
+- epoch 44: loss=0.3919, acc=0.8315
+- epoch 45: loss=0.3902, acc=0.8231
+- epoch 46: loss=0.3982, acc=0.8241
+- epoch 47: loss=0.3793, acc=0.8370
+- epoch 48: loss=0.3779, acc=0.8312
+- epoch 49: loss=0.3692, acc=0.8328
+- epoch 50: loss=0.3712, acc=0.8378
+- epoch 51: loss=0.3476, acc=0.8546
+- epoch 52: loss=0.3583, acc=0.8473
+- epoch 53: loss=0.3635, acc=0.8415
+- epoch 54: loss=0.3569, acc=0.8507
+- epoch 55: loss=0.3473, acc=0.8404
+- epoch 56: loss=0.3383, acc=0.8515
+- epoch 57: loss=0.3278, acc=0.8633
+- epoch 58: loss=0.3414, acc=0.8538
+- epoch 59: loss=0.3299, acc=0.8517
+- epoch 60: loss=0.3307, acc=0.8565
+- epoch 61: loss=0.3248, acc=0.8594
+- epoch 62: loss=0.3180, acc=0.8646
+- epoch 63: loss=0.3135, acc=0.8628
+- epoch 64: loss=0.3007, acc=0.8743
+- epoch 65: loss=0.3112, acc=0.8630
+- epoch 66: loss=0.3074, acc=0.8696
+- epoch 67: loss=0.3018, acc=0.8691
+- epoch 68: loss=0.2892, acc=0.8830
+- epoch 69: loss=0.2922, acc=0.8757
+- epoch 70: loss=0.2947, acc=0.8722
+
+## Test metrics (independent)
+- AUC: 0.6510
+- F1: 0.3646
+- Recall: 0.2559
+- Precision: 0.6335
+- Composite Score: 0.3675 (0.5*Recall + 0.3*F1 + 0.2*AUC)
+- Precision-aware Score: 0.5563 (0.5*Precision + 0.3*F1 + 0.2*AUC)
+## Confusion matrix (TP/FP/FN/TN)
+- TP: 140
+- FP: 81
+- FN: 407
+- TN: 439
+
+## Top 4 epochs by Composite
+- N/A (no validation set used)
+
+## Top 4 epochs by Precision-aware
+- N/A (no validation set used)

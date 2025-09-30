@@ -135,6 +135,10 @@ def main(argv: list[str] | None = None):
     ap.add_argument('--tcn_dil_growth', type=int, default=2)
     ap.add_argument('--fc_hidden', type=int, default=128)
     ap.add_argument('--fc_dropout', type=float, default=0.2)
+    # new: scheduler & focal loss
+    ap.add_argument('--lr_schedule', type=str, default='none', choices=['none','cosine'], help='Learning rate schedule (cosine or none).')
+    ap.add_argument('--eta_min_factor', type=float, default=0.1, help='eta_min = lr * eta_min_factor for cosine schedule')
+    ap.add_argument('--focal_gamma', type=float, default=0.0, help='>0 to enable FocalLoss with given gamma (overrides CE)')
     args = ap.parse_args(argv)
 
     torch.manual_seed(args.seed)
@@ -190,13 +194,41 @@ def main(argv: list[str] | None = None):
         fc_hidden=args.fc_hidden, fc_dropout=args.fc_dropout,
     ).to(device)
 
-    criterion = nn.CrossEntropyLoss()
+    # ----- Loss (CrossEntropy or Focal) -----
+    if args.focal_gamma > 0:
+        class FocalLoss(nn.Module):
+            def __init__(self, gamma: float = 1.5, reduction: str = 'mean'):
+                super().__init__()
+                self.gamma = gamma
+                self.reduction = reduction
+            def forward(self, logits, target):
+                # logits: (N, C), target: (N,)
+                log_probs = torch.log_softmax(logits, dim=-1)
+                probs = log_probs.exp()
+                idx = torch.arange(logits.size(0), device=logits.device)
+                log_p_t = log_probs[idx, target]
+                p_t = probs[idx, target]
+                loss = - (1 - p_t).pow(self.gamma) * log_p_t
+                if self.reduction == 'mean':
+                    return loss.mean()
+                elif self.reduction == 'sum':
+                    return loss.sum()
+                return loss
+        criterion = FocalLoss(gamma=args.focal_gamma)
+    else:
+        criterion = nn.CrossEntropyLoss()
+
     optim = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    if args.lr_schedule == 'cosine':
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=args.epochs, eta_min=args.lr * args.eta_min_factor)
+    else:
+        scheduler = None
     num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     cfg = {'model': 'gcn_tcn', 'split': 'short', 'device': device, 'num_params': num_params, 'epochs': args.epochs,
            'batch_size': args.batch_size, 'lr': args.lr, 'weight_decay': args.weight_decay, 'seed': args.seed,
            'use_norm': args.use_norm, 'balance_by_class': args.balance_by_class, 'amplify_hard_negative': args.amplify_hard_negative,
            'hard_negative_factor': args.hard_negative_factor, 'temporal_jitter_frames': args.temporal_jitter_frames,
+           'lr_schedule': args.lr_schedule, 'eta_min_factor': args.eta_min_factor, 'focal_gamma': args.focal_gamma,
            'val_ratio': args.val_ratio, 'num_workers': args.num_workers, 'params': {'gcn_hidden': args.gcn_hidden, 'tcn_channels': args.tcn_channels,
            'tcn_kernel': args.tcn_kernel, 'tcn_dropout': args.tcn_dropout, 'tcn_dil_growth': args.tcn_dil_growth, 'fc_hidden': args.fc_hidden, 'fc_dropout': args.fc_dropout},
            'data': meta}
@@ -209,7 +241,10 @@ def main(argv: list[str] | None = None):
     history: List[Dict[str, Any]] = []
     for epoch in range(1, args.epochs+1):
         tr_loss, tr_acc = train_one_epoch(model, tr_loader, device, criterion, optim)
-        rec = {'epoch': epoch, 'train_loss': float(tr_loss), 'train_acc': float(tr_acc)}
+        if scheduler is not None:
+            scheduler.step()
+        current_lr = optim.param_groups[0]['lr']
+        rec = {'epoch': epoch, 'train_loss': float(tr_loss), 'train_acc': float(tr_acc), 'lr': current_lr}
         history.append(rec)
         with log_path.open('a', encoding='utf-8') as f:
             f.write(json.dumps(rec) + "\n")
@@ -217,7 +252,7 @@ def main(argv: list[str] | None = None):
             best = {'train_acc': tr_acc, 'epoch': epoch}
             torch.save({'model': model.state_dict(), 'epoch': epoch, 'train_acc': tr_acc}, run_dir / 'best.ckpt')
         torch.save({'model': model.state_dict(), 'epoch': epoch, 'train_acc': tr_acc}, run_dir / 'last.ckpt')
-        print(f"[E{epoch:03d}] train_loss={tr_loss:.4f} acc={tr_acc:.4f} | best@{best['epoch']}={best['train_acc']:.4f}")
+        print(f"[E{epoch:03d}] train_loss={tr_loss:.4f} acc={tr_acc:.4f} lr={current_lr:.6g} | best@{best['epoch']}={best['train_acc']:.4f}")
 
     # post-run verification
     actual_epochs = 0

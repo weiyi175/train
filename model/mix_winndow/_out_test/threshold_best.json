@@ -1,0 +1,28 @@
+{
+  "best_composite": {
+    "auc": 0.2984686217595836,
+    "f1": 0.6531986531986532,
+    "recall": 1.0,
+    "precision": 0.485,
+    "composite": 0.7556533203115128,
+    "precision_aware": 0.49815332031151266,
+    "TP": 97,
+    "FP": 103,
+    "FN": 0,
+    "TN": 0,
+    "threshold": 0.05
+  },
+  "best_precision_aware": {
+    "auc": 0.2984686217595836,
+    "f1": 0.6531986531986532,
+    "recall": 1.0,
+    "precision": 0.485,
+    "composite": 0.7556533203115128,
+    "precision_aware": 0.49815332031151266,
+    "TP": 97,
+    "FP": 103,
+    "FN": 0,
+    "TN": 0,
+    "threshold": 0.05
+  }
+}
